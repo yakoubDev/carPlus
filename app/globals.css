@@ -2,20 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*{
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+
+
+@layer base{
+  body{
+    @apply bg-primary font-primary text-white leading-loose px-8 xl:px-12 py-5 overflow-x-hidden
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.button{
+  @apply bg-accent flex items-center justify-center rounded-md text-base text-primary font-semibold transition-colors px-2 xl:px-6  py-2 outline-none;
 }
+
+button:hover{
+  @apply bg-accent-hover
+}
+
+
+.input{
+  @apply bg-primary rounded-md indent-4 h-12 focus:border-accent focus:border-[1px] outline-none
+}
+
+
+
+/* Animations */
+.slide-in-right {
+	-webkit-animation: slide-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	        animation: slide-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@-webkit-keyframes slide-in-right {
+  0% {
+    -webkit-transform: translateX(400px);
+            transform: translateX(400px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-right {
+  0% {
+    -webkit-transform: translateX(400px);
+            transform: translateX(400px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+    opacity: 1;
+  }
+}
+
