@@ -11,7 +11,7 @@
 
 @layer base{
   body{
-    @apply bg-primary font-primary text-white leading-loose px-8 xl:px-12 py-5 overflow-x-hidden
+    @apply bg-primary font-primary text-white leading-loose px-4 md:px-12 py-5 overflow-x-hidden
   }
 }
 

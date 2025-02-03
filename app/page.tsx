@@ -37,18 +37,16 @@ const Home = () => {
         </p>
 
         <div className="flex gap-4">
-          {session?.user ? (
-            <Link href="">
-              <button className="button">Get Assistance Now !</button>
-            </Link>
-          ) : (
+      
             <button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() =>
+                session?.user ? router.push('/assist') :  signIn("google", { callbackUrl: "/" }
+                 )}
               className="button"
             >
               Get Assistance Now !
             </button>
-          )}
+          
         </div>
       </div>
 

@@ -7,23 +7,26 @@ import { useState } from "react";
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 
-const links = [
-  {
-    name: "Home",
-    path: "/",
-  },
-  {
-    name: "Process",
-    path: "#process",
-  },
-  {
-    name: "Assist",
-    path: "/assist",
-  },
-];
+
 
 const Nav = () => {
   const pathname = usePathname();
+
+  const links = [
+    {
+      name: "Home",
+      path: "/",
+    },
+    {
+      name: "Process",
+      path:  `${pathname === '/' ? '#process' : '/#process'}`,
+    },
+    {
+      name: "Assist",
+      path: "/assist",
+    },
+  ];
+
   const {data: session} = useSession();
   const [toggleMenu, setToggleMenu] = useState(false);
 
@@ -78,7 +81,7 @@ const Nav = () => {
       </div>
 
       {toggleMenu && (
-        <div className="bg-primary w-[60%] py-4  fixed right-0 top-16 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
+        <div className="bg-primary w-[60%] py-4  fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
           <div className="flex justify-end items-center w-full px-4">
             <IoMdClose
               className="text-[32px] text-accent flex flex-end"
