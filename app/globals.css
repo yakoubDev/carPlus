@@ -11,7 +11,7 @@
 
 @layer base{
   body{
-    @apply bg-primary font-primary text-white leading-loose px-4 md:px-12 py-5 overflow-x-hidden
+    @apply bg-primary font-primary text-white leading-loose px-4 md:px-12 pt-5 overflow-x-hidden
   }
 }
 
@@ -25,7 +25,11 @@ button:hover{
 
 
 .input{
-  @apply bg-primary rounded-md indent-4 h-12 focus:border-accent focus:border-[1px] outline-none
+  @apply bg-primary rounded-md indent-4 h-12 focus-within:border-accent focus:border-[1px] outline-none
+}
+
+.input-pic{
+  @apply flex justify-start items-center  w-full bg-primary focus-within:border-accent focus-within:border-[1px] rounded-md px-2;
 }
 
 

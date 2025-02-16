@@ -44,6 +44,8 @@ export const authOptions: NextAuthOptions = {
       // Fetch the user's complete data from the database
       const dbUser = await User.findOne({ email: session?.user?.email });
       if (dbUser) {
+        session.user.name= dbUser.name;
+        session.user.email = dbUser.email;
         session.user.phone = dbUser.phone;
         session.user.role = dbUser.role;
         session.user.location = dbUser.location || { type: "Point", coordinates: [0, 0] }; // Ensure location is included

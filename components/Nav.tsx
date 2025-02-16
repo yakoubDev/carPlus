@@ -1,13 +1,15 @@
 "use client";
 
-import {signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import {  usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
+import { CgProfile } from "react-icons/cg";
 
-
+import { motion } from "motion/react";
 
 const Nav = () => {
   const pathname = usePathname();
@@ -19,7 +21,7 @@ const Nav = () => {
     },
     {
       name: "Process",
-      path:  `${pathname === '/' ? '#process' : '/#process'}`,
+      path: `${pathname === "/" ? "#process" : "/#process"}`,
     },
     {
       name: "Assist",
@@ -27,81 +29,29 @@ const Nav = () => {
     },
   ];
 
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const [toggleMenu, setToggleMenu] = useState(false);
 
   return (
-    <nav className="flex justify-between items-center">
-      <Link href="/" className="text-4xl inline-flex gap-1">
-        <span>Car</span>
-        <span className="text-accent">+</span>
-      </Link>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: 1,
+        transition: { delay: 0.8, duration: 0.6, ease: "easeIn" },
+      }}
+    >
+      <nav className="flex justify-between items-center">
+        <Link href="/" className="text-4xl inline-flex gap-1">
+          <span>Car</span>
+          <span className="text-accent">+</span>
+        </Link>
 
-      {/* Desktop Nav */}
-      <div className="hidden xl:flex gap-8 items-center">
-        {links.map((link, index) => (
-          <Link
-            href={link.path}
-            key={index}
-            className={`${
-              link.path === pathname && "text-accent border-b-2 border-accent"
-            } font-medium hover:text-accent transition-all`}
-          >
-            {link.name}
-          </Link>
-        ))}
-
-        <div className="flex gap-4 items-center ml-8">
-          {session?.user ? (
-            <button className="button" onClick={()=> signOut({callbackUrl: '/'})}>
-              Logout
-            </button>
-          ) :
-              <button className="button" onClick={()=> signIn('google', {callbackUrl: '/'},)}>
-                Login
-              </button>
-          }
-        
-        </div>
-      </div>
-
-      {/* Mobile Nav */}
-      <div className="block xl:hidden">
-        {toggleMenu ? (
-          <IoMdClose
-            className="text-[32px] text-accent"
-            onClick={() => setToggleMenu((prev) => !prev)}
-          />
-        ) : (
-          <CiMenuFries
-            className="text-[32px] text-accent"
-            onClick={() => setToggleMenu((prev) => !prev)}
-          />
-        )}
-      </div>
-
-      {toggleMenu && (
-        <div className="bg-primary w-[60%] py-4  fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
-          <div className="flex justify-end items-center w-full px-4">
-            <IoMdClose
-              className="text-[32px] text-accent flex flex-end"
-              onClick={() => setToggleMenu((prev) => !prev)}
-            />
-          </div>
-
-          <Link
-            href="/"
-            className="text-4xl inline-flex gap-1"
-            onClick={() => setToggleMenu(false)}
-          >
-            <span>Car</span>
-            <span className="text-accent">+ </span>
-          </Link>
+        {/* Desktop Nav */}
+        <div className="hidden xl:flex gap-8 items-center">
           {links.map((link, index) => (
             <Link
               href={link.path}
               key={index}
-              onClick={() => setToggleMenu(false)} // Close menu on link click
               className={`${
                 link.path === pathname && "text-accent border-b-2 border-accent"
               } font-medium hover:text-accent transition-all`}
@@ -109,18 +59,103 @@ const Nav = () => {
               {link.name}
             </Link>
           ))}
-         {session?.user ? (
-            <button className="button" onClick={()=> signOut({callbackUrl: '/'})}>
-              Logout
-            </button>
-          ) :
-              <button className="button" onClick={()=> signIn('google', {callbackUrl: '/'},)}>
+
+          <div className="flex gap-4 items-center ml-8">
+            {session?.user ? (
+              <button
+                className="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                className="button"
+                onClick={() => signIn("google", { callbackUrl: "/" })}
+              >
                 Login
               </button>
-          }
+            )}
+
+            {session?.user && (
+              <Link href={"/complete-profile"}>
+                <CgProfile className="text-[40px]  hover:text-accent transition-all " />
+              </Link>
+            )}
+          </div>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile Nav */}
+
+        <div className="flex xl:hidden gap-8">
+          {session?.user && (
+            <Link href={"/complete-profile"}>
+              <CgProfile className="text-[34px] text-accent " />
+            </Link>
+          )}
+
+          {toggleMenu ? (
+            <IoMdClose
+              className="text-[32px] text-accent"
+              onClick={() => setToggleMenu((prev) => !prev)}
+            />
+          ) : (
+            <CiMenuFries
+              className="text-[32px] text-accent"
+              onClick={() => setToggleMenu((prev) => !prev)}
+            />
+          )}
+        </div>
+
+        {toggleMenu && (
+          <div className="bg-primary w-[60%] py-4  fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
+            <div className="flex justify-end items-center w-full px-4">
+              <IoMdClose
+                className="text-[32px] text-accent flex flex-end"
+                onClick={() => setToggleMenu((prev) => !prev)}
+              />
+            </div>
+
+            <Link
+              href="/"
+              className="text-4xl inline-flex gap-1"
+              onClick={() => setToggleMenu(false)}
+            >
+              <span>Car</span>
+              <span className="text-accent">+ </span>
+            </Link>
+            {links.map((link, index) => (
+              <Link
+                href={link.path}
+                key={index}
+                onClick={() => setToggleMenu(false)} // Close menu on link click
+                className={`${
+                  link.path === pathname &&
+                  "text-accent border-b-2 border-accent"
+                } font-medium hover:text-accent transition-all`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            {session?.user ? (
+              <button
+                className="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                className="button"
+                onClick={() => signIn("google", { callbackUrl: "/" })}
+              >
+                Login
+              </button>
+            )}
+          </div>
+        )}
+      </nav>
+    </motion.div>
   );
 };
 

@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request){
     try {
-        const {email, role, phone} = await request.json();
+        const {email, role, phone, name} = await request.json();
 
-        const user = await User.findOneAndUpdate({email}, {role,phone});
+        const user = await User.findOneAndUpdate({email}, {role,phone,name});
         
         if(!user){
             return NextResponse.json({error:'User not found.'}, {status:404});

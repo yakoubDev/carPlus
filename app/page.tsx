@@ -3,9 +3,10 @@ import { signIn, useSession } from "next-auth/react";
 import React, { useEffect } from "react";
 import { useUser } from "./context/userContext";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import Process from "@/components/Process";
+
+import {motion} from 'motion/react'
 
 const Home = () => {
   const router = useRouter();
@@ -23,7 +24,12 @@ const Home = () => {
   }, [user]);
 
   return (
-    <main className="">
+    <motion.div
+    initial={{opacity:0}}
+    animate = {{
+      opacity:1,
+      transition:{delay:0.8, duration:0.6, ease: "easeIn"}
+    }}>
     <div className="flex flex-col items-center justify-center gap-12 xl:flex-row xl:justify-between pt-12">
       <div className="flex flex-col gap-4 w-full xl:w-2/3 text-center xl:text-left items-center xl:items-start">
         <h1 className="text-5xl md:text-7xl font-semibold">
@@ -61,7 +67,7 @@ const Home = () => {
     </div>
 
     <Process/>
-    </main>
+    </motion.div>
   );
 };
 
