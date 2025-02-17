@@ -107,7 +107,7 @@ const CompleteProfile = () => {
               placeholder="Phone Number"
               className="input w-full border-none"
               required
-              pattern="0[0-9]{8}"
+              pattern="0[0-9]{9}"
               value={user?.phone || ""}
               onChange={(e) => setUser({ ...user, phone: e.target.value })}
             />

@@ -14,7 +14,12 @@ export const UserProvider = ({ children }) => {
     phone: session?.user.phone || "",
     role: session?.user.role || "",
     image: session?.user.image || "",
-    location: session?.user.location || { type: "Point", coordinates: [0, 0] },
+    location: session?.user.location
+      ? {
+          latitude: session?.user.location.coordinates[1],
+          longitude: session?.user.location.coordinates[0],
+        }
+      : { latitude: 0, longitude: 0 },
   });
 
   useEffect(() => {
@@ -25,7 +30,12 @@ export const UserProvider = ({ children }) => {
         phone: session?.user.phone,
         role: session?.user.role,
         image: session?.user.image,
-        location: session?.user.location || { type: "Point", coordinates: [0, 0] },
+        location: session?.user.location
+          ? {
+              latitude: session?.user.location.coordinates[1],
+              longitude: session?.user.location.coordinates[0],
+            }
+          : { latitude: 0, longitude: 0 },
       });
     }
   }, [session]);

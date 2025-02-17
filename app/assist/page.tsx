@@ -1,110 +1,194 @@
-'use client'
+'use client';
 import * as React from 'react';
-import Head from 'next/head';
-import {Map, Marker} from '@vis.gl/react-maplibre';
+import { Map, Marker } from '@vis.gl/react-maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { MdOutlineMessage, MdAddCall } from 'react-icons/md';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useUser } from '../context/userContext';
 
-import { MdOutlineMessage } from "react-icons/md";
-import { MdAddCall } from "react-icons/md";
+type RescueService = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+};
 
+type Filters = {
+  roadAssist: boolean;
+  mechanic: boolean;
+};
 
 export default function Assist() {
+  const { user, setUser } = useUser();
+  const [services, setServices] = React.useState<RescueService[]>([]);
+  const [filters, setFilters] = React.useState<Filters>({
+    roadAssist: true,
+    mechanic: true,
+  });
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // Get geolocation and update context
+  React.useEffect(() => {
+    const fetchUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setUser((prev: any) => ({
+              ...prev,
+              location: { latitude, longitude }
+            }));
+          },
+          (error) => {
+            console.error('Geolocation error:', error);
+            setIsLoading(false);
+          }
+        );
+      } else {
+        console.error('Geolocation not supported');
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserLocation();
+  }, [setUser]);
+
+  // Update location in DB and fetch services
+  React.useEffect(() => {
+    const updateAndFetch = async () => {
+      try {
+        // Update location
+        if (user?.email && user?.location) {
+          await fetch('/api/update-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              location: user.location
+            }),
+          });
+        }
+
+        // Fetch services
+        if (user?.location?.latitude && user?.location?.longitude) {
+          const response = await fetch(
+            `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=10`
+          );
+          const data = await response.json();
+          setServices(data);
+        }
+      } catch (error) {
+        console.error('Operation failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    updateAndFetch();
+  }, [user]);
+
+  const filteredServices = services.filter((service) => {
+    if (filters.roadAssist && service.role === 'road_assist') return true;
+    if (filters.mechanic && service.role === 'mechanic') return true;
+    return false;
+  });
+
+  const handleFilterChange = (type: keyof Filters) => {
+    setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  if (isLoading) return <div className="text-white p-4">Loading services...</div>;
+
   return (
-    <section className='w-full mt-8 flex gap-4 items-center'>
+    <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
+      {/* Map */}
       <Map
         initialViewState={{
-          latitude: 36.9,
-          longitude: 7.76,
-          zoom: 14
+          latitude: user?.location?.latitude || 36.9,
+          longitude: user?.location?.longitude || 7.76,
+          zoom: 14,
         }}
-        style={{width: 600, height: 480}}
+        style={{ width: 550, height: 480 }}
         mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
       >
-        <Marker latitude={36.90} longitude={7.74} color="red" />
+        {filteredServices.map((service) => (
+          <Marker
+            key={service.id}
+            latitude={service.location.latitude}
+            longitude={service.location.longitude}
+            color={service.role === 'road_assist' ? 'blue' : 'red'}
+          />
+        ))}
       </Map>
 
-      <section className='w-1/2 flex flex-col gap-4'>
-        <div className='flex gap-4 items-center'>
-        <h1 className='text-3xl text-accent font-semibold text-left'>Assist Nearby:</h1>
-          <div className='flex items-center gap-3'>
-            <label htmlFor="">
-              <input type="checkbox" className='mr-2 w-3 h-3' />
+      {/* RIGHT: List of Cards */}
+      <section className="w-full lg:w-1/2 flex flex-col gap-4">
+        <div className="flex gap-4 items-center">
+          <h1 className="text-3xl text-accent font-semibold text-left">Assist Nearby:</h1>
+          <div className="flex items-center gap-3">
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.roadAssist}
+                onChange={() => handleFilterChange('roadAssist')}
+                className="mr-2 w-3 h-3"
+              />
               Road Assist
             </label>
-
-            <label> 
-              <input type="checkbox" className='mr-2 w-3 h-3' />
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.mechanic}
+                onChange={() => handleFilterChange('mechanic')}
+                className="mr-2 w-3 h-3"
+              />
               Mechanic
             </label>
           </div>
         </div>
 
-        {/* Cards */}
-        <div className='shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold'>
-          <div className='flex  justify-between  items-center '>
-            <span className="text-accent">Name: <span className='text-white'>Tayebi Ahcene</span></span>
-            <span className="text-accent">Phone: <span className='text-white'>0659170552</span></span>
-          </div>
+        <ScrollArea className="h-[450px]">
+          <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
+            {filteredServices.length > 0 ? (
+              filteredServices.map((service) => (
+                <div
+                  key={service.id}
+                  className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-accent">
+                      Name: <span className="text-white">{service.name}</span>
+                    </span>
+                    <span className="text-accent">
+                      Phone: <span className="text-white">{service.phone}</span>
+                    </span>
+                  </div>
 
-          <div className='flex justify-between items-center'>
-          <span className="text-accent">Type: <span className='text-white'>Road Assist</span></span>
-
-            <div className='flex gap-2'>
-              <button className='button'><MdOutlineMessage className='text-xl text-black'/></button>
-              <button className='button'> <MdAddCall className='text-xl text-black'/> </button>
-            </div>
-          </div>
-        </div>
-
-        <div className='shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold'>
-          <div className='flex  justify-between  items-center '>
-            <span className="text-accent">Name: <span className='text-white'>Tayebi Ahcene</span></span>
-            <span className="text-accent">Phone: <span className='text-white'>0659170552</span></span>
-          </div>
-
-          <div className='flex justify-between items-center'>
-          <span className="text-accent">Type: <span className='text-white'>Road Assist</span></span>
-
-            <div className='flex gap-2'>
-              <button className='button'><MdOutlineMessage className='text-xl text-black'/></button>
-              <button className='button'> <MdAddCall className='text-xl text-black'/> </button>
-            </div>
-          </div>
-        </div>
-
-        <div className='shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold'>
-          <div className='flex  justify-between  items-center '>
-            <span className="text-accent">Name: <span className='text-white'>Tayebi Ahcene</span></span>
-            <span className="text-accent">Phone: <span className='text-white'>0659170552</span></span>
-          </div>
-
-          <div className='flex justify-between items-center'>
-          <span className="text-accent">Type: <span className='text-white'>Road Assist</span></span>
-
-            <div className='flex gap-2'>
-              <button className='button'><MdOutlineMessage className='text-xl text-black'/></button>
-              <button className='button'> <MdAddCall className='text-xl text-black'/> </button>
-            </div>
-          </div>
-        </div>
-
-        <div className='shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold'>
-          <div className='flex  justify-between  items-center '>
-            <span className="text-accent">Name: <span className='text-white'>Tayebi Ahcene</span></span>
-            <span className="text-accent">Phone: <span className='text-white'>0659170552</span></span>
-          </div>
-
-          <div className='flex justify-between items-center'>
-          <span className="text-accent">Type: <span className='text-white'>Road Assist</span></span>
-
-            <div className='flex gap-2'>
-              <button className='button'><MdOutlineMessage className='text-xl text-black'/></button>
-              <button className='button'> <MdAddCall className='text-xl text-black'/> </button>
-            </div>
-          </div>
-        </div>
-
-
+                  <div className="flex justify-between items-center">
+                    <span className="text-accent">
+                      Type: <span className="text-white">{service.role}</span>
+                    </span>
+                    <div className="flex gap-2">
+                      <button className="button">
+                        <MdOutlineMessage className="text-xl text-black" />
+                      </button>
+                      <button className="button">
+                        <MdAddCall className="text-xl text-black" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-white">No services available.</div>
+            )}
+          </ul>
+        </ScrollArea>
       </section>
     </section>
   );
