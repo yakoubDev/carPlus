@@ -21,7 +21,7 @@ const Footer = () => {
     },
   ];
   return (
-    <footer className="flex flex-col gap-6 mt-4 p-2 md:p-10 xl:px-8">
+    <footer className="flex flex-col gap-6 mt-4 p-0 md:p-10 xl:px-8">
         {/* Upper Section */}
       <section className="flex flex-col xl:flex-row  gap-12 xl:justify-between items-center">
         {/* Logo And Socials */}
@@ -75,7 +75,7 @@ const Footer = () => {
 
               <div className='flex gap-1 items-center'>
               <Image src='/assets/socials/address.svg' height={20} width={20} alt='email' className='font-bold'/>
-              <span>: Chui Guivera 192. 2nd Street</span>
+              <span>: Chui Guivera 192.</span>
               </div>
             </div>
         </div>
