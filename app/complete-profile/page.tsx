@@ -122,9 +122,9 @@ const CompleteProfile = () => {
               className="input w-full border-none"
             >
               <option value="">Select your account type</option>
-              <option value="driver">Driver</option>
-              <option value="mechanic">Mechanic</option>
-              <option value="road_assist">Road Assist</option>
+              <option value="Driver">Driver</option>
+              <option value="Mechanic">Mechanic</option>
+              <option value="Road Assist">Road Assist</option>
             </select>
           </div>
 

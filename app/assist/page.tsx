@@ -90,7 +90,7 @@ export default function Assist() {
             },
           }));
           setServices(formattedData);
-          console.log("Available Services:", formattedData);
+          // console.log("Available Services:", formattedData);
         }
       } catch (error) {
         console.error("Operation failed:", error);
@@ -103,14 +103,16 @@ export default function Assist() {
   }, [user.location]);
 
   const filteredServices = services.filter((service) => {
-    if (filters.roadAssist && service.role === "road_assist") return true;
-    if (filters.mechanic && service.role === "mechanic") return true;
+    if (filters.roadAssist && service.role === "Road Assist") return true;
+    if (filters.mechanic && service.role === "Mechanic") return true;
     return false;
   });
 
   const handleFilterChange = (type: keyof Filters) => {
     setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
   };
+
+  
 
   if (isLoading)
     return <div className="text-white p-4">Loading services...</div>;
@@ -120,25 +122,21 @@ export default function Assist() {
       {/* Map */}
       <Map
         initialViewState={{
-          latitude: user?.location?.latitude ?? 36.9,
-          longitude: user?.location?.longitude ?? 7.76,
+          latitude: user?.location?.latitude || 36.26,
+          longitude: user?.location?.longitude || 7.94,
           zoom: 14,
         }}
         style={{ width: 550, height: 480 }}
         mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
       >
         {filteredServices
-          .filter(
-            (service) =>
-              !isNaN(service.location.latitude) &&
-              !isNaN(service.location.longitude)
-          )
           .map((service, index) => (
             <Marker
               key={index}
               latitude={Number(service.location.latitude)}
               longitude={Number(service.location.longitude)}
-              color={service.role === "road_assist" ? "blue" : "red"}
+              color={service.role === "Road Assist" || service.role === "Mechanic" ? "green" : "blue"}
+
             />
           ))}
       </Map>
