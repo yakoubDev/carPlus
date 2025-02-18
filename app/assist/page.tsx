@@ -17,9 +17,19 @@ type RescueService = {
   };
 };
 
+
 type Filters = {
   roadAssist: boolean;
   mechanic: boolean;
+};
+
+type User = {
+  name:string;
+  email: string;
+  phone: string;
+  role:string;
+  image:string;
+  location: { latitude: number; longitude: number };
 };
 
 export default function Assist() {
@@ -38,7 +48,7 @@ export default function Assist() {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            setUser((prev: any) => ({
+            setUser((prev: User) => ({
               ...prev,
               location: { latitude, longitude },
             }));

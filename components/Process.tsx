@@ -40,7 +40,6 @@ const Process = () => {
             opacity: 1,
             translateX: 0,
             transition: { delay: 0.3, duration: 0.6, ease: "easeIn" },
-            triggeOnce: true,
           }}
           
           id="wrapper"

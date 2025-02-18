@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       await connectToDB();
 
       // Check if the user already exists
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async session({ session, token }) {
+    async session({ session }) {
       await connectToDB();
 
       // Fetch the user's complete data from the database
