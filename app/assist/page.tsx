@@ -1,13 +1,12 @@
-'use client';
-import * as React from 'react';
-import { Map, Marker } from '@vis.gl/react-maplibre';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { MdOutlineMessage, MdAddCall } from 'react-icons/md';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useUser } from '../context/userContext';
+"use client";
+import * as React from "react";
+import { Map, Marker } from "@vis.gl/react-maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { MdOutlineMessage, MdAddCall } from "react-icons/md";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUser } from "../context/userContext";
 
 type RescueService = {
-  id: string;
   name: string;
   email: string;
   phone: string;
@@ -41,16 +40,17 @@ export default function Assist() {
             const { latitude, longitude } = position.coords;
             setUser((prev: any) => ({
               ...prev,
-              location: { latitude, longitude }
+              location: { latitude, longitude },
             }));
+            // console.log("Location updated");
           },
           (error) => {
-            console.error('Geolocation error:', error);
+            console.error("Geolocation error:", error);
             setIsLoading(false);
           }
         );
       } else {
-        console.error('Geolocation not supported');
+        console.error("Geolocation not supported");
         setIsLoading(false);
       }
     };
@@ -64,12 +64,12 @@ export default function Assist() {
       try {
         // Update location
         if (user?.email && user?.location) {
-          await fetch('/api/update-location', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          await fetch("/api/update-location", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: user.email,
-              location: user.location
+              location: user.location,
             }),
           });
         }
@@ -79,22 +79,32 @@ export default function Assist() {
           const response = await fetch(
             `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=10`
           );
-          const data = await response.json();
-          setServices(data);
+          const AvailableServices = await response.json();
+
+          // Transform location format
+          const formattedData = AvailableServices.map((service: any) => ({
+            ...service,
+            location: {
+              latitude: service.location.coordinates[1],
+              longitude: service.location.coordinates[0],
+            },
+          }));
+          setServices(formattedData);
+          console.log("Available Services:", formattedData);
         }
       } catch (error) {
-        console.error('Operation failed:', error);
+        console.error("Operation failed:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     updateAndFetch();
-  }, [user]);
+  }, [user.location]);
 
   const filteredServices = services.filter((service) => {
-    if (filters.roadAssist && service.role === 'road_assist') return true;
-    if (filters.mechanic && service.role === 'mechanic') return true;
+    if (filters.roadAssist && service.role === "road_assist") return true;
+    if (filters.mechanic && service.role === "mechanic") return true;
     return false;
   });
 
@@ -102,40 +112,49 @@ export default function Assist() {
     setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
   };
 
-  if (isLoading) return <div className="text-white p-4">Loading services...</div>;
+  if (isLoading)
+    return <div className="text-white p-4">Loading services...</div>;
 
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
       {/* Map */}
       <Map
         initialViewState={{
-          latitude: user?.location?.latitude || 36.9,
-          longitude: user?.location?.longitude || 7.76,
+          latitude: user?.location?.latitude ?? 36.9,
+          longitude: user?.location?.longitude ?? 7.76,
           zoom: 14,
         }}
         style={{ width: 550, height: 480 }}
         mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
       >
-        {filteredServices.map((service) => (
-          <Marker
-            key={service.id}
-            latitude={service.location.latitude}
-            longitude={service.location.longitude}
-            color={service.role === 'road_assist' ? 'blue' : 'red'}
-          />
-        ))}
+        {filteredServices
+          .filter(
+            (service) =>
+              !isNaN(service.location.latitude) &&
+              !isNaN(service.location.longitude)
+          )
+          .map((service, index) => (
+            <Marker
+              key={index}
+              latitude={Number(service.location.latitude)}
+              longitude={Number(service.location.longitude)}
+              color={service.role === "road_assist" ? "blue" : "red"}
+            />
+          ))}
       </Map>
 
       {/* RIGHT: List of Cards */}
       <section className="w-full lg:w-1/2 flex flex-col gap-4">
         <div className="flex gap-4 items-center">
-          <h1 className="text-3xl text-accent font-semibold text-left">Assist Nearby:</h1>
+          <h1 className="text-3xl text-accent font-semibold text-left">
+            Assist Nearby:
+          </h1>
           <div className="flex items-center gap-3">
             <label>
               <input
                 type="checkbox"
                 checked={filters.roadAssist}
-                onChange={() => handleFilterChange('roadAssist')}
+                onChange={() => handleFilterChange("roadAssist")}
                 className="mr-2 w-3 h-3"
               />
               Road Assist
@@ -144,7 +163,7 @@ export default function Assist() {
               <input
                 type="checkbox"
                 checked={filters.mechanic}
-                onChange={() => handleFilterChange('mechanic')}
+                onChange={() => handleFilterChange("mechanic")}
                 className="mr-2 w-3 h-3"
               />
               Mechanic
@@ -155,9 +174,9 @@ export default function Assist() {
         <ScrollArea className="h-[450px]">
           <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
             {filteredServices.length > 0 ? (
-              filteredServices.map((service) => (
+              filteredServices.map((service, index) => (
                 <div
-                  key={service.id}
+                  key={index}
                   className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold"
                 >
                   <div className="flex justify-between items-center">
