@@ -32,11 +32,11 @@ const Home = () => {
     }}>
     <div className="flex flex-col items-center justify-center gap-12 xl:flex-row xl:justify-between pt-12">
       <div className="flex flex-col gap-4 w-full xl:w-2/3 text-center xl:text-left items-center xl:items-start">
-        <h1 className="text-5xl md:text-7xl font-semibold">
+        <h1 className="text-4xl md:text-7xl font-semibold">
           <span className="text-accent">Fast Assistance</span> When You Need It
           Most
         </h1>
-        <p className="text-lg md:text-xl max-w-[700px] text-white/60">
+        <p className="text-base md:text-xl max-w-full xl:max-w-[700px] text-white/60">
           Whether you’re on the road or at home, quickly connect with reliable
           roadside assistance and trusted mechanics, ready to help whenever you
           need them.

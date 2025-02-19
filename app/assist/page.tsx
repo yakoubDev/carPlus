@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Map, Marker } from "@vis.gl/react-maplibre";
+import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MdOutlineMessage, MdAddCall } from "react-icons/md";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,22 +17,22 @@ type RescueService = {
   };
 };
 
-
 type Filters = {
   roadAssist: boolean;
   mechanic: boolean;
 };
 
 type User = {
-  name:string;
+  name: string;
   email: string;
   phone: string;
-  role:string;
-  image:string;
+  role: string;
+  image: string;
   location: { latitude: number; longitude: number };
 };
 
 export default function Assist() {
+  
   const { user, setUser } = useUser();
   const [services, setServices] = React.useState<RescueService[]>([]);
   const [filters, setFilters] = React.useState<Filters>({
@@ -40,6 +40,20 @@ export default function Assist() {
     mechanic: true,
   });
   const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedService, setSelectedService] = React.useState<RescueService | null>(null);
+  const mapRef = React.useRef<any>(null); // Create a reference for the map
+
+  const handleSelectService = (service: RescueService) => {
+    setSelectedService(service);
+  
+    if (mapRef.current) {
+      mapRef.current.flyTo({
+        center: [service.location.longitude, service.location.latitude],
+        zoom: 14, // Adjust zoom level as needed
+        essential: true, // Ensures smooth animation
+      });
+    }
+  };
 
   // Get geolocation and update context
   React.useEffect(() => {
@@ -87,7 +101,7 @@ export default function Assist() {
         // Fetch services
         if (user?.location?.latitude && user?.location?.longitude) {
           const response = await fetch(
-            `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=10`
+            `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=5`
           );
           const AvailableServices = await response.json();
 
@@ -100,7 +114,7 @@ export default function Assist() {
             },
           }));
           setServices(formattedData);
-          // console.log("Available Services:", formattedData);
+          console.log("Available Services:", formattedData);
         }
       } catch (error) {
         console.error("Operation failed:", error);
@@ -122,33 +136,52 @@ export default function Assist() {
     setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
   };
 
-  
-
-  if (isLoading)
+  if (isLoading || !user?.location.latitude || !user?.location.longitude)
     return <div className="text-white p-4">Loading services...</div>;
 
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
       {/* Map */}
       <Map
+        ref={mapRef}
         initialViewState={{
-          latitude: user?.location?.latitude || 36.26,
-          longitude: user?.location?.longitude || 7.94,
+          latitude: user?.location?.latitude,
+          longitude: user?.location?.longitude,
           zoom: 14,
         }}
         style={{ width: 550, height: 480 }}
         mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
       >
-        {filteredServices
-          .map((service, index) => (
-            <Marker
-              key={index}
-              latitude={Number(service.location.latitude)}
-              longitude={Number(service.location.longitude)}
-              color={service.role === "Road Assist" || service.role === "Mechanic" ? "green" : "blue"}
-
-            />
-          ))}
+        {filteredServices.map((service, index) => (
+          <Marker
+            key={index}
+            latitude={Number(service.location.latitude)}
+            longitude={Number(service.location.longitude)}
+            color={
+              ["Road Assist", "Mechanic"].includes(service.role)
+                ? "green"
+                : "blue"
+            }
+            onClick={(e) => {
+              e.originalEvent.stopPropagation(); // Prevent event bubbling
+              setSelectedService(service);
+            }}
+          />
+        ))}
+         {selectedService && selectedService.location && (
+        <Popup
+        latitude={Number(selectedService.location.latitude)}
+        longitude={Number(selectedService.location.longitude)}
+          onClose={() => setSelectedService(null)} // Close popup on click
+          closeOnClick
+        >
+          <div className="p-2 bg-black rounded shadow-md text-center">
+            <h3 className="text-base font-semibold text-accent">{selectedService.name}</h3>
+            <p className="text-base text-white">{selectedService.role}</p>
+            <p className="text-base text-white"> {selectedService.phone}</p>
+          </div>
+        </Popup>
+         )}
       </Map>
 
       {/* RIGHT: List of Cards */}
@@ -186,6 +219,7 @@ export default function Assist() {
                 <div
                   key={index}
                   className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold"
+                  onClick={() =>handleSelectService(service)}
                 >
                   <div className="flex justify-between items-center">
                     <span className="text-accent">

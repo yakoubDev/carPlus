@@ -44,10 +44,10 @@ const Process = () => {
           
           id="wrapper"
           key={index}
-          className="group w-full flex flex-col xl:flex-row items-center justify-center gap-4 shadow-md shadow-accent text-center xl:text-start rounded-md py-4"
+          className="group w-full flex flex-col xl:flex-row items-center justify-center gap-8 xl:gap-4 shadow-md shadow-accent text-center xl:text-start rounded-md py-4"
         >
           {/* LEFT */}
-          <div className="flex flex-col gap-2  w-2/3">
+          <div className="flex flex-col gap-2 w-full  xl:w-2/3">
             {/* TITLE */}
             <div className="flex justify-center xl:justify-start gap-4 items-center">
               <div className="h-12 w-12 rounded-full bg-accent flex items-center justify-center">
@@ -60,7 +60,7 @@ const Process = () => {
               </span>
             </div>
             {/* DESCRIPTION */}
-            <p className="text-white/60 max-w-full xl:max-w-[500px]">
+            <p className="text-white/60 max-w-full xl:max-w-[500px] text-balance">
               {process.description}
             </p>
           </div>
