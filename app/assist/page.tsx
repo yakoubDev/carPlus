@@ -220,7 +220,7 @@ export default function Assist() {
               filteredServices.map((service, index) => (
                 <div
                   key={index}
-                  className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
+                  className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
                   onClick={() =>handleSelectService(service)}
                 >
                   <div className="flex justify-between items-center">
