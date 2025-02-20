@@ -2,7 +2,10 @@
 import * as React from "react";
 import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
+
 import { MdOutlineMessage, MdAddCall } from "react-icons/md";
+import { FaSpinner } from "react-icons/fa";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "../context/userContext";
 
@@ -32,7 +35,6 @@ type User = {
 };
 
 export default function Assist() {
-  
   const { user, setUser } = useUser();
   const [services, setServices] = React.useState<RescueService[]>([]);
   const [filters, setFilters] = React.useState<Filters>({
@@ -40,12 +42,13 @@ export default function Assist() {
     mechanic: true,
   });
   const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedService, setSelectedService] = React.useState<RescueService | null>(null);
+  const [selectedService, setSelectedService] =
+    React.useState<RescueService | null>(null);
   const mapRef = React.useRef<any>(null); // Create a reference for the map
 
   const handleSelectService = (service: RescueService) => {
     setSelectedService(service);
-  
+
     if (mapRef.current) {
       mapRef.current.flyTo({
         center: [service.location.longitude, service.location.latitude],
@@ -137,7 +140,11 @@ export default function Assist() {
   };
 
   if (isLoading || !user?.location.latitude || !user?.location.longitude)
-    return <div className="text-white p-4">Loading services...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-primary text-white text-2xl">
+        <FaSpinner className="animate-spin text-4xl mb-3 text-accent" />
+      </div>
+    );
 
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
@@ -170,18 +177,25 @@ export default function Assist() {
             />
           ))}
           {selectedService && selectedService.location && (
-          <Popup
-          latitude={Number(selectedService.location.latitude)}
-          longitude={Number(selectedService.location.longitude)}
-            onClose={() => setSelectedService(null)} // Close popup on click
-            closeOnClick
-          >
-            <div className="p-2 bg-primary rounded shadow-md text-center">
-              <h3 className="text-base font-semibold text-accent">{selectedService.name}</h3>
-              <p className="text-base text-white/60">{selectedService.role}</p>
-              <p className="text-base text-white/60"> {selectedService.phone}</p>
-            </div>
-          </Popup>
+            <Popup
+              latitude={Number(selectedService.location.latitude)}
+              longitude={Number(selectedService.location.longitude)}
+              onClose={() => setSelectedService(null)} // Close popup on click
+              closeOnClick
+            >
+              <div className="p-2 bg-primary rounded shadow-md text-center">
+                <h3 className="text-base font-semibold text-accent">
+                  {selectedService.name}
+                </h3>
+                <p className="text-base text-white/60">
+                  {selectedService.role}
+                </p>
+                <p className="text-base text-white/60">
+                  {" "}
+                  {selectedService.phone}
+                </p>
+              </div>
+            </Popup>
           )}
         </Map>
       </div>
@@ -221,7 +235,7 @@ export default function Assist() {
                 <div
                   key={index}
                   className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
-                  onClick={() =>handleSelectService(service)}
+                  onClick={() => handleSelectService(service)}
                 >
                   <div className="flex justify-between items-center">
                     <span className="text-accent">
