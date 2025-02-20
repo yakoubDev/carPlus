@@ -142,47 +142,49 @@ export default function Assist() {
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
       {/* Map */}
-      <Map
-        ref={mapRef}
-        initialViewState={{
-          latitude: user?.location?.latitude,
-          longitude: user?.location?.longitude,
-          zoom: 14,
-        }}
-        style={{ width: 550, height: 480 }}
-        mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
-      >
-        {filteredServices.map((service, index) => (
-          <Marker
-            key={index}
-            latitude={Number(service.location.latitude)}
-            longitude={Number(service.location.longitude)}
-            color={
-              ["Road Assist", "Mechanic"].includes(service.role)
-                ? "green"
-                : "blue"
-            }
-            onClick={(e) => {
-              e.originalEvent.stopPropagation(); // Prevent event bubbling
-              setSelectedService(service);
-            }}
-          />
-        ))}
-         {selectedService && selectedService.location && (
-        <Popup
-        latitude={Number(selectedService.location.latitude)}
-        longitude={Number(selectedService.location.longitude)}
-          onClose={() => setSelectedService(null)} // Close popup on click
-          closeOnClick
+      <div id="map_container" className="w-[95%] xl:w-1/2">
+        <Map
+          ref={mapRef}
+          initialViewState={{
+            latitude: user?.location?.latitude,
+            longitude: user?.location?.longitude,
+            zoom: 14,
+          }}
+          style={{ width: "100%", height: 460 }}
+          mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
         >
-          <div className="p-2 bg-black rounded shadow-md text-center">
-            <h3 className="text-base font-semibold text-accent">{selectedService.name}</h3>
-            <p className="text-base text-white">{selectedService.role}</p>
-            <p className="text-base text-white"> {selectedService.phone}</p>
-          </div>
-        </Popup>
-         )}
-      </Map>
+          {filteredServices.map((service, index) => (
+            <Marker
+              key={index}
+              latitude={Number(service.location.latitude)}
+              longitude={Number(service.location.longitude)}
+              color={
+                ["Road Assist", "Mechanic"].includes(service.role)
+                  ? "green"
+                  : "blue"
+              }
+              onClick={(e) => {
+                e.originalEvent.stopPropagation(); // Prevent event bubbling
+                setSelectedService(service);
+              }}
+            />
+          ))}
+          {selectedService && selectedService.location && (
+          <Popup
+          latitude={Number(selectedService.location.latitude)}
+          longitude={Number(selectedService.location.longitude)}
+            onClose={() => setSelectedService(null)} // Close popup on click
+            closeOnClick
+          >
+            <div className="p-2 bg-primary rounded shadow-md text-center">
+              <h3 className="text-base font-semibold text-accent">{selectedService.name}</h3>
+              <p className="text-base text-white/60">{selectedService.role}</p>
+              <p className="text-base text-white/60"> {selectedService.phone}</p>
+            </div>
+          </Popup>
+          )}
+        </Map>
+      </div>
 
       {/* RIGHT: List of Cards */}
       <section className="w-full lg:w-1/2 flex flex-col gap-4">
@@ -218,7 +220,7 @@ export default function Assist() {
               filteredServices.map((service, index) => (
                 <div
                   key={index}
-                  className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold"
+                  className="shadow-sm shadow-accent flex flex-col gap-3 px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
                   onClick={() =>handleSelectService(service)}
                 >
                   <div className="flex justify-between items-center">
