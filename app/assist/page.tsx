@@ -44,6 +44,7 @@ export default function Assist() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedService, setSelectedService] =
     React.useState<RescueService | null>(null);
+  const [userLocation, setuserLocation] = React.useState<boolean>(false);
   const mapRef = React.useRef<any>(null); // Create a reference for the map
 
   const handleSelectService = (service: RescueService) => {
@@ -194,6 +195,28 @@ export default function Assist() {
                   {" "}
                   {selectedService.phone}
                 </p>
+              </div>
+            </Popup>
+          )}
+          <Marker
+            latitude={Number(user?.location.latitude)}
+            longitude={Number(user?.location.longitude)}
+            color="red"
+            onClick={(e)=> {
+              e.originalEvent.stopPropagation();
+              setuserLocation(!userLocation)}}
+          />
+          {user?.location && userLocation && (
+            <Popup
+              latitude={Number(user?.location.latitude)}
+              longitude={Number(user?.location.longitude)}
+              onClose={() => setSelectedService(null)} // Close popup on click
+              closeOnClick
+            >
+              <div className="p-2 bg-primary rounded shadow-md text-center">
+                <h3 className="text-base font-semibold text-accent">
+                  Your Location
+                </h3>
               </div>
             </Popup>
           )}
