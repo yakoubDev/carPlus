@@ -10,6 +10,7 @@ import { IoMdClose } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 
 const Nav = () => {
   const pathname = usePathname();
@@ -79,7 +80,17 @@ const Nav = () => {
 
             {session?.user && (
               <Link href={"/complete-profile"}>
-                <CgProfile className="text-[40px]  hover:text-accent transition-all " />
+                {session.user.image ? (
+                  <Image
+                    src={session.user.image}
+                    alt="profile"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <CgProfile className="text-[40px] hover:text-accent transition-all" />
+                )}
               </Link>
             )}
           </div>
@@ -90,7 +101,17 @@ const Nav = () => {
         <div className="flex xl:hidden gap-8">
           {session?.user && (
             <Link href={"/complete-profile"}>
-              <CgProfile className="text-[34px] text-accent " />
+              {session.user.image ? (
+                <Image
+                  src={session.user.image}
+                  alt="profile"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+              ) : (
+                <CgProfile className="text-[34px] hover:text-accent transition-all" />
+              )}
             </Link>
           )}
 

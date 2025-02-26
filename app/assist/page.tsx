@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useState } from "react";
 import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -36,15 +37,17 @@ type User = {
 
 export default function Assist() {
   const { user, setUser } = useUser();
-  const [services, setServices] = React.useState<RescueService[]>([]);
-  const [filters, setFilters] = React.useState<Filters>({
+  const [services, setServices] = useState<RescueService[]>([]);
+  const [filters, setFilters] = useState<Filters>({
     roadAssist: true,
     mechanic: true,
   });
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [selectedService, setSelectedService] =
-    React.useState<RescueService | null>(null);
-  const [userLocation, setuserLocation] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState<RescueService | null>(
+    null
+  );
+  const [userLocation, setuserLocation] = useState<boolean>(false);
+  const [selectedRadius, setSelectedRadius] = useState<string>("10");
   const mapRef = React.useRef<any>(null); // Create a reference for the map
 
   const handleSelectService = (service: RescueService) => {
@@ -105,9 +108,12 @@ export default function Assist() {
         // Fetch services
         if (user?.location?.latitude && user?.location?.longitude) {
           const response = await fetch(
-            `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=5`
+            `/api/rescue-services?lat=${user.location.latitude}&lng=${user.location.longitude}&radius=${selectedRadius}`
           );
-          const AvailableServices = await response.json();
+          const data = await response.json();
+
+          // Ensure data is an array
+          const AvailableServices = Array.isArray(data) ? data : [];
 
           // Transform location format
           const formattedData = AvailableServices.map((service: any) => ({
@@ -128,7 +134,7 @@ export default function Assist() {
     };
 
     updateAndFetch();
-  }, [user.location]);
+  }, [user.location, selectedRadius]);
 
   const filteredServices = services.filter((service) => {
     if (filters.roadAssist && service.role === "Road Assist") return true;
@@ -202,9 +208,10 @@ export default function Assist() {
             latitude={Number(user?.location.latitude)}
             longitude={Number(user?.location.longitude)}
             color="red"
-            onClick={(e)=> {
+            onClick={(e) => {
               e.originalEvent.stopPropagation();
-              setuserLocation(!userLocation)}}
+              setuserLocation(!userLocation);
+            }}
           />
           {user?.location && userLocation && (
             <Popup
@@ -225,11 +232,11 @@ export default function Assist() {
 
       {/* RIGHT: List of Cards */}
       <section className="w-full lg:w-1/2 flex flex-col gap-4">
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col gap-4 ">
           <h1 className="text-3xl text-accent font-semibold text-left">
             Assist Nearby:
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <label>
               <input
                 type="checkbox"
@@ -248,6 +255,16 @@ export default function Assist() {
               />
               Mechanic
             </label>
+
+            <select
+              className="input w-[100px] border-accent border-[1px]"
+              onChange={(e) => setSelectedRadius(e.target.value)}
+            >
+              <option value="5">5 km</option>
+              <option value="10">10 km</option>
+              <option value="20">20 km</option>
+              <option value="50">50 km</option>
+            </select>
           </div>
         </div>
 
