@@ -256,7 +256,7 @@ export default function Assist() {
               Mechanic
             </label>
 
-            <select
+            {/* <select
               className="input w-[100px] border-accent border-[1px]"
               onChange={(e) => setSelectedRadius(e.target.value)}
             >
@@ -264,7 +264,19 @@ export default function Assist() {
               <option value="10">10 km</option>
               <option value="20">20 km</option>
               <option value="50">50 km</option>
-            </select>
+            </select> */}
+
+            <label htmlFor="radius" >Radius: <span className="font-bold text-accent">{selectedRadius} km</span></label>
+            <input
+              id="radius"
+              type="range"
+              min="1" // Minimum 1 km
+              max="50" // Maximum 50 km
+              step="1" // Adjust step size
+              value={selectedRadius}
+              onChange={(e) => setSelectedRadius(String(e.target.value))}
+              className="h-2 bg-white rounded-lg appearance-none cursor-pointer accent-accent"
+            />
           </div>
         </div>
 
