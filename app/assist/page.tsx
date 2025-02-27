@@ -154,7 +154,7 @@ export default function Assist() {
     );
 
   return (
-    <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center">
+    <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center lg:items-start">
       {/* Map */}
       <div id="map_container" className="w-[95%] xl:w-1/2">
         <Map
@@ -242,7 +242,7 @@ export default function Assist() {
                 type="checkbox"
                 checked={filters.roadAssist}
                 onChange={() => handleFilterChange("roadAssist")}
-                className="mr-2 w-3 h-3"
+                className="mr-2 w-4 h-4 accent-accent"
               />
               Road Assist
             </label>
@@ -251,7 +251,7 @@ export default function Assist() {
                 type="checkbox"
                 checked={filters.mechanic}
                 onChange={() => handleFilterChange("mechanic")}
-                className="mr-2 w-3 h-3"
+                className="mr-2 w-4 h-4 accent-accent"
               />
               Mechanic
             </label>
@@ -265,7 +265,8 @@ export default function Assist() {
               <option value="20">20 km</option>
               <option value="50">50 km</option>
             </select> */}
-
+          </div>
+            
             <label htmlFor="radius" >Radius: <span className="font-bold text-accent">{selectedRadius} km</span></label>
             <input
               id="radius"
@@ -275,9 +276,8 @@ export default function Assist() {
               step="1" // Adjust step size
               value={selectedRadius}
               onChange={(e) => setSelectedRadius(String(e.target.value))}
-              className="h-2 bg-white rounded-lg appearance-none cursor-pointer accent-accent"
+              className="h-2 bg-white rounded-lg appearance-none cursor-pointer accent-accent mb-2"
             />
-          </div>
         </div>
 
         <ScrollArea className="h-[450px]">
