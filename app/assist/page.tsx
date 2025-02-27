@@ -173,15 +173,17 @@ export default function Assist() {
               latitude={Number(service.location.latitude)}
               longitude={Number(service.location.longitude)}
               color={
-                ["Road Assist", "Mechanic"].includes(service.role)
-                  ? "green"
-                  : "blue"
+                ["Mechanic"].includes(service.role)
+                  ? "orange"
+                  : "green"
               }
               onClick={(e) => {
                 e.originalEvent.stopPropagation(); // Prevent event bubbling
                 setSelectedService(service);
               }}
-            />
+            >
+              {/* <img src={`${service.role == "Mechanic" ? "/assets/mechanic-icon.png" : "/assets/roadside-icon.png" }`} width={30} height={30} alt="" /> */}
+            </Marker>
           ))}
           {selectedService && selectedService.location && (
             <Popup
@@ -267,7 +269,7 @@ export default function Assist() {
             </select> */}
           </div>
             
-            <label htmlFor="radius" >Radius: <span className="font-bold text-accent">{selectedRadius} km</span></label>
+            <label htmlFor="radius" >Radius: <span className="font-bold text-accent">{selectedRadius} km</span>
             <input
               id="radius"
               type="range"
@@ -276,8 +278,9 @@ export default function Assist() {
               step="1" // Adjust step size
               value={selectedRadius}
               onChange={(e) => setSelectedRadius(String(e.target.value))}
-              className="h-2 bg-white rounded-lg appearance-none cursor-pointer accent-accent mb-2"
+              className="h-2 w-[190px] lg:w-[250px] bg-white rounded-lg appearance-none cursor-pointer accent-accent ml-2 mb-2"
             />
+            </label>
         </div>
 
         <ScrollArea className="h-[450px]">
