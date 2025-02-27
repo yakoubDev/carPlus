@@ -172,17 +172,17 @@ export default function Assist() {
               key={index}
               latitude={Number(service.location.latitude)}
               longitude={Number(service.location.longitude)}
-              color={
-                ["Mechanic"].includes(service.role)
-                  ? "orange"
-                  : "green"
-              }
+              // color={
+              //   ["Mechanic"].includes(service.role)
+              //     ? "orange"
+              //     : "green"
+              // }
               onClick={(e) => {
                 e.originalEvent.stopPropagation(); // Prevent event bubbling
                 setSelectedService(service);
               }}
             >
-              {/* <img src={`${service.role == "Mechanic" ? "/assets/mechanic-icon.png" : "/assets/roadside-icon.png" }`} width={30} height={30} alt="" /> */}
+              <img src={`${service.role == "Mechanic" ? "/assets/mechanic.svg" : "/assets/roadside.svg" }`} width={35} height={35} alt="" />
             </Marker>
           ))}
           {selectedService && selectedService.location && (
