@@ -153,6 +153,37 @@ export default function Assist() {
       </div>
     );
 
+
+    const handleServiceRequest = async (service: RescueService) => {
+      try {
+        const response = await fetch("/api/send-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            driverName: user.name,
+            driverPhone: user.phone,
+            driverEmail: user.email,
+            location: {
+              latitude: service?.location.latitude, // or however you're storing the location
+              longitude: service?.location.longitude,
+            },
+            rescuerEmail: service.email, // rescuer's email
+          }),
+        });
+    
+        const result = await response.json();
+        if (response.ok) {
+          alert("Request sent successfully!");
+        } else {
+          alert(result.message || "Failed to send request.");
+        }
+      } catch (error) {
+        console.error("Request failed:", error);
+        alert("Something went wrong while sending the request.");
+      }
+    };
+    
+
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center lg:items-start">
       {/* Map */}
@@ -182,7 +213,16 @@ export default function Assist() {
                 setSelectedService(service);
               }}
             >
-              <img src={`${service.role == "Mechanic" ? "/assets/mechanic.svg" : "/assets/roadside.svg" }`} width={35} height={35} alt="" />
+              <img
+                src={`${
+                  service.role == "Mechanic"
+                    ? "/assets/mechanic.svg"
+                    : "/assets/roadside.svg"
+                }`}
+                width={35}
+                height={35}
+                alt=""
+              />
             </Marker>
           ))}
           {selectedService && selectedService.location && (
@@ -257,19 +297,11 @@ export default function Assist() {
               />
               Mechanic
             </label>
-
-            {/* <select
-              className="input w-[100px] border-accent border-[1px]"
-              onChange={(e) => setSelectedRadius(e.target.value)}
-            >
-              <option value="5">5 km</option>
-              <option value="10">10 km</option>
-              <option value="20">20 km</option>
-              <option value="50">50 km</option>
-            </select> */}
           </div>
-            
-            <label htmlFor="radius" >Radius: <span className="font-bold text-accent">{selectedRadius} km</span>
+
+          <label htmlFor="radius">
+            Radius:{" "}
+            <span className="font-bold text-accent">{selectedRadius} km</span>
             <input
               id="radius"
               type="range"
@@ -280,7 +312,7 @@ export default function Assist() {
               onChange={(e) => setSelectedRadius(String(e.target.value))}
               className="h-2 w-[190px] lg:w-[250px] bg-white rounded-lg appearance-none cursor-pointer accent-accent ml-2 mb-2"
             />
-            </label>
+          </label>
         </div>
 
         <ScrollArea className="h-[450px]">
@@ -305,14 +337,12 @@ export default function Assist() {
                     <span className="text-accent">
                       Type: <span className="text-white">{service.role}</span>
                     </span>
-                    <div className="flex gap-2">
-                      <button className="button">
-                        <MdOutlineMessage className="text-xl text-black" />
-                      </button>
-                      <button className="button">
-                        <MdAddCall className="text-xl text-black" />
-                      </button>
-                    </div>
+                    <button
+                      className="button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all"
+                      onClick={() => handleServiceRequest(service)}
+                    >
+                      Request
+                    </button>
                   </div>
                 </div>
               ))
