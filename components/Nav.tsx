@@ -8,6 +8,7 @@ import { useState } from "react";
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
+import { FaBell } from "react-icons/fa";
 
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -16,22 +17,20 @@ const Nav = () => {
   const pathname = usePathname();
 
   const links = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "Process",
-      path: `${pathname === "/" ? "#process" : "/#process"}`,
-    },
-    {
-      name: "Assist",
-      path: "/assist",
-    },
+    { name: "Home", path: "/" },
+    { name: "Process", path: `${pathname === "/" ? "#process" : "/#process"}` },
+    { name: "Assist", path: "/assist" },
   ];
 
   const { data: session } = useSession();
   const [toggleMenu, setToggleMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // 🔔 Dummy notifications (replace with fetched ones)
+  const notifications = [
+    { id: 1, message: "New rescue request from John Doe" },
+    { id: 2, message: "Driver waiting at your location" },
+  ];
 
   return (
     <motion.div
@@ -61,14 +60,68 @@ const Nav = () => {
             </Link>
           ))}
 
-          <div className="flex gap-4 items-center ml-8">
+          <div className="flex gap-4 items-center ml-8 relative">
             {session?.user ? (
-              <button
-                className="button"
-                onClick={() => signOut({ callbackUrl: "/" })}
-              >
-                Logout
-              </button>
+              <>
+                <button
+                  className="button"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  Logout
+                </button>
+
+                   {/* 🔔 Notifications */}
+                   <div className="relative">
+                  <FaBell
+                    className="text-[24px] cursor-pointer hover:text-accent"
+                    onClick={() => setShowNotifications((prev) => !prev)}
+                  />
+                  {notifications.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                      {notifications.length}
+                    </span>
+                  )}
+
+                  {/* Dropdown */}
+                  {showNotifications && (
+                    <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[500px] z-50 p-2">
+                      {notifications.length > 0 ? (
+                        notifications.map((note) => (
+                          <div
+                            key={note.id}
+                            className="text-sm py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between   items-center"
+                          >
+                            <p>{note.message}</p>
+                            <div className="flex gap-2">
+                              <button className="bg-accent text-black font-semibold px-3 py-2 w-24 rounded hover:bg-opacity-80 transition-all">Accept</button>
+                              <button className="bg-red-600 text-black font-semibold px-3 py-2 w-24 rounded hover:bg-opacity-80 transition-all">Decline</button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-gray-500 px-2 py-2">
+                          No new notifications
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Profile */}
+                <Link href={"/complete-profile"}>
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="profile"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <CgProfile className="text-[40px] hover:text-accent transition-all" />
+                  )}
+                </Link>
+              </>
             ) : (
               <button
                 className="button"
@@ -77,27 +130,10 @@ const Nav = () => {
                 Login
               </button>
             )}
-
-            {session?.user && (
-              <Link href={"/complete-profile"}>
-                {session.user.image ? (
-                  <Image
-                    src={session.user.image}
-                    alt="profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <CgProfile className="text-[40px] hover:text-accent transition-all" />
-                )}
-              </Link>
-            )}
           </div>
         </div>
 
         {/* Mobile Nav */}
-
         <div className="flex xl:hidden gap-8">
           {session?.user && (
             <Link href={"/complete-profile"}>
@@ -114,6 +150,47 @@ const Nav = () => {
               )}
             </Link>
           )}
+          
+          {/* 🔔 Notifications */}
+          <div className="relative flex items-center justify-center xl:hidden">
+            <FaBell
+              className="text-[24px] cursor-pointer hover:text-accent"
+              onClick={() => setShowNotifications((prev) => !prev)}
+            />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                {notifications.length}
+              </span>
+            )}
+
+            {/* Dropdown */}
+            {showNotifications && (
+              <div className="absolute top-10 right-[-70px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
+                {notifications.length > 0 ? (
+                  notifications.map((note) => (
+                    <div
+                      key={note.id}
+                      className="text-xs py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between items-center"
+                    >
+                      <p>{note.message}</p>
+                      <div className="flex gap-2">
+                        <button className="bg-accent text-black font-semibold px-1 py-1 text-xs rounded hover:bg-opacity-80 transition-all">
+                          Accept
+                        </button>
+                        <button className="bg-red-600 text-white/80 font-semibold px-1 py-1 text-xs rounded hover:bg-opacity-80 transition-all">
+                          Decline
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-gray-500 px-2 py-2">
+                    No new notifications
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {toggleMenu ? (
             <IoMdClose
@@ -129,7 +206,7 @@ const Nav = () => {
         </div>
 
         {toggleMenu && (
-          <div className="bg-primary w-[60%] py-4  fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
+          <div className="bg-primary w-[60%] py-4 fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
             <div className="flex justify-end items-center w-full px-4">
               <IoMdClose
                 className="text-[32px] text-accent flex flex-end"
@@ -145,11 +222,12 @@ const Nav = () => {
               <span>Car</span>
               <span className="text-accent">+ </span>
             </Link>
+
             {links.map((link, index) => (
               <Link
                 href={link.path}
                 key={index}
-                onClick={() => setToggleMenu(false)} // Close menu on link click
+                onClick={() => setToggleMenu(false)}
                 className={`${
                   link.path === pathname &&
                   "text-accent border-b-2 border-accent"
@@ -158,6 +236,7 @@ const Nav = () => {
                 {link.name}
               </Link>
             ))}
+
             {session?.user ? (
               <button
                 className="button"
