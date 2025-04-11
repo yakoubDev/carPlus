@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
@@ -14,24 +14,58 @@ import { FaBell } from "react-icons/fa";
 import { motion } from "motion/react";
 import Image from "next/image";
 
-const Nav = () => {
+  const Nav = () => {
+    type Notification = {
+      id: string;
+      driverName: string;
+      driverPhone: string;
+      driverEmail: string;
+      rescuerEmail: string;
+      location: {
+        latitude: number;
+        longitude: number;
+      };
+      status: "pending" | "accepted" | "declined";
+    };
+    
   const pathname = usePathname();
-
   const links = [
     { name: "Home", path: "/" },
     { name: "Process", path: `${pathname === "/" ? "#process" : "/#process"}` },
     { name: "Assist", path: "/assist" },
   ];
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [toggleMenu, setToggleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // 🔔 Dummy notifications (replace with fetched ones)
-  const notifications = [
-    { id: 1, message: "New rescue request from John Doe" },
-    { id: 2, message: "Driver waiting at your location" },
-  ];
+  
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    const getNotifications = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch(`/api/get-notifications?email=${session?.user.email}`);
+          const data = await response.json();
+
+          console.log(data);
+          console.log(notifications);
+
+          if (response.ok) {
+            setNotifications(data.notifications);
+          } else {
+            console.error("Failed to fetch notifications", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching notifications:", error);
+        }
+      }
+    };
+  
+    getNotifications();
+  }, [status, session?.user?.email]);
+  
 
   return (
     <motion.div
@@ -87,12 +121,12 @@ const Nav = () => {
                   {showNotifications && (
                     <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[500px] z-50 p-2">
                       {notifications.length > 0 ? (
-                        notifications.map((note) => (
+                        notifications.map((note,index) => (
                           <div
-                            key={note.id}
+                            key={index}
                             className="text-sm py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between   items-center"
                           >
-                            <p>{note.message}</p>
+                            <p>New Request from {note.driverName}</p>
                             <div className="flex gap-2">
                               <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition">
                                 <FaCheck />
@@ -173,12 +207,12 @@ const Nav = () => {
               {showNotifications && (
                 <div className="absolute top-10 right-[-70px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
                   {notifications.length > 0 ? (
-                    notifications.map((note) => (
+                    notifications.map((note,index) => (
                       <div
-                        key={note.id}
+                        key={index}
                         className="text-xs py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between items-center"
                       >
-                        <p>{note.message}</p>
+                        <p>New Request from {note.driverName}</p>
                         <div className="flex gap-2">
                           <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition">
                             <FaCheck />
