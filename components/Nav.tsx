@@ -8,6 +8,7 @@ import { useState } from "react";
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
+import { FaCheck, FaTimes } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
 
 import { motion } from "motion/react";
@@ -70,8 +71,8 @@ const Nav = () => {
                   Logout
                 </button>
 
-                   {/* 🔔 Notifications */}
-                   <div className="relative">
+                {/* 🔔 Notifications */}
+                <div className="relative flex">
                   <FaBell
                     className="text-[24px] cursor-pointer hover:text-accent"
                     onClick={() => setShowNotifications((prev) => !prev)}
@@ -93,8 +94,12 @@ const Nav = () => {
                           >
                             <p>{note.message}</p>
                             <div className="flex gap-2">
-                              <button className="bg-accent text-black font-semibold px-3 py-2 w-24 rounded hover:bg-opacity-80 transition-all">Accept</button>
-                              <button className="bg-red-600 text-black font-semibold px-3 py-2 w-24 rounded hover:bg-opacity-80 transition-all">Decline</button>
+                              <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition">
+                                <FaCheck />
+                              </button>
+                              <button className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 transition">
+                                <FaTimes />
+                              </button>
                             </div>
                           </div>
                         ))
@@ -150,47 +155,49 @@ const Nav = () => {
               )}
             </Link>
           )}
-          
-          {/* 🔔 Notifications */}
-          <div className="relative flex items-center justify-center xl:hidden">
-            <FaBell
-              className="text-[24px] cursor-pointer hover:text-accent"
-              onClick={() => setShowNotifications((prev) => !prev)}
-            />
-            {notifications.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                {notifications.length}
-              </span>
-            )}
 
-            {/* Dropdown */}
-            {showNotifications && (
-              <div className="absolute top-10 right-[-70px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
-                {notifications.length > 0 ? (
-                  notifications.map((note) => (
-                    <div
-                      key={note.id}
-                      className="text-xs py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between items-center"
-                    >
-                      <p>{note.message}</p>
-                      <div className="flex gap-2">
-                        <button className="bg-accent text-black font-semibold px-1 py-1 text-xs rounded hover:bg-opacity-80 transition-all">
-                          Accept
-                        </button>
-                        <button className="bg-red-600 text-white/80 font-semibold px-1 py-1 text-xs rounded hover:bg-opacity-80 transition-all">
-                          Decline
-                        </button>
+          {/* 🔔 Notifications */}
+          {session?.user && (
+            <div className="relative flex items-center justify-center xl:hidden">
+              <FaBell
+                className="text-[24px] cursor-pointer hover:text-accent"
+                onClick={() => setShowNotifications((prev) => !prev)}
+              />
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                  {notifications.length}
+                </span>
+              )}
+
+              {/* Dropdown */}
+              {showNotifications && (
+                <div className="absolute top-10 right-[-70px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
+                  {notifications.length > 0 ? (
+                    notifications.map((note) => (
+                      <div
+                        key={note.id}
+                        className="text-xs py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between items-center"
+                      >
+                        <p>{note.message}</p>
+                        <div className="flex gap-2">
+                          <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition">
+                            <FaCheck />
+                          </button>
+                          <button className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 transition">
+                            <FaTimes />
+                          </button>
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500 px-2 py-2">
+                      No new notifications
                     </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-gray-500 px-2 py-2">
-                    No new notifications
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {toggleMenu ? (
             <IoMdClose
