@@ -319,6 +319,7 @@ export default function Assist() {
           <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
             {filteredServices.length > 0 ? (
               filteredServices.map((service, index) => (
+                (service.name !== user?.name) &&
                 <div
                   key={index}
                   className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
