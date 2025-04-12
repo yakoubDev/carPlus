@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { MdOutlineMessage, MdAddCall } from "react-icons/md";
-import { FaSpinner } from "react-icons/fa";
+import { toast } from "sonner";
+import { FaCheck, FaSpinner } from "react-icons/fa";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "../context/userContext";
@@ -48,6 +48,7 @@ export default function Assist() {
   );
   const [userLocation, setuserLocation] = useState<boolean>(false);
   const [selectedRadius, setSelectedRadius] = useState<string>("10");
+  const [requesting, setRequesting] = useState<string | null>(null);
   const mapRef = React.useRef<any>(null); // Create a reference for the map
 
   const handleSelectService = (service: RescueService) => {
@@ -153,36 +154,44 @@ export default function Assist() {
       </div>
     );
 
+  const handleServiceRequest = async (service: RescueService) => {
+    if (requesting === service.email) return; // Prevent duplicate request to the same service
 
-    const handleServiceRequest = async (service: RescueService) => {
-      try {
-        const response = await fetch("/api/send-request", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            driverName: user.name,
-            driverPhone: user.phone,
-            driverEmail: user.email,
-            location: {
-              latitude: service?.location.latitude, // or however you're storing the location
-              longitude: service?.location.longitude,
-            },
-            rescuerEmail: service.email, // rescuer's email
-          }),
-        });
-    
-        const result = await response.json();
-        if (response.ok) {
-          alert("Request sent successfully!");
-        } else {
-          alert(result.message || "Failed to send request.");
-        }
-      } catch (error) {
-        console.error("Request failed:", error);
-        alert("Something went wrong while sending the request.");
+    setRequesting(service.email); // Mark this service as being requested
+    try {
+      const response = await fetch("/api/send-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          driverName: user.name,
+          driverPhone: user.phone,
+          driverEmail: user.email,
+          location: {
+            latitude: service?.location.latitude,
+            longitude: service?.location.longitude,
+          },
+          rescuerEmail: service.email,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success(`Request sent to ${service.name}`);
+
+        // Optionally disable all requests for 5 seconds
+        setTimeout(() => {
+          setRequesting(null);
+        }, 5000);
+      } else {
+        toast.error(result.message || "Failed to send request.");
+        setRequesting(null);
       }
-    };
-    
+    } catch (error) {
+      console.error("Request failed:", error);
+      toast.error("Something went wrong while sending the request.");
+      setRequesting(null);
+    }
+  };
 
   return (
     <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center lg:items-start">
@@ -318,35 +327,47 @@ export default function Assist() {
         <ScrollArea className="h-[450px]">
           <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
             {filteredServices.length > 0 ? (
-              filteredServices.map((service, index) => (
-                (service.name !== user?.name) &&
-                <div
-                  key={index}
-                  className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
-                  onClick={() => handleSelectService(service)}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-accent">
-                      Name: <span className="text-white">{service.name}</span>
-                    </span>
-                    <span className="text-accent">
-                      Phone: <span className="text-white">{service.phone}</span>
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-accent">
-                      Type: <span className="text-white">{service.role}</span>
-                    </span>
-                    <button
-                      className="button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all"
-                      onClick={() => handleServiceRequest(service)}
+              filteredServices.map(
+                (service, index) =>
+                  service.name !== user?.name && (
+                    <div
+                      key={index}
+                      className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
+                      onClick={() => handleSelectService(service)}
                     >
-                      Request
-                    </button>
-                  </div>
-                </div>
-              ))
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent">
+                          Name:{" "}
+                          <span className="text-white">{service.name}</span>
+                        </span>
+                        <span className="text-accent">
+                          Phone:{" "}
+                          <span className="text-white">{service.phone}</span>
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-accent">
+                          Type:{" "}
+                          <span className="text-white">{service.role}</span>
+                        </span>
+                        <button
+                          disabled={requesting === service.email}
+                          className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
+                            requesting === service.email
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          onClick={() => handleServiceRequest(service)}
+                        >
+                          {requesting === service.email
+                            ? <FaCheck/>
+                            : "Request"}
+                        </button>
+                      </div>
+                    </div>
+                  )
+              )
             ) : (
               <div className="text-white">No services available.</div>
             )}

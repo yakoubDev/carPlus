@@ -7,6 +7,9 @@ import Footer from '@/components/Footer';
 import Provider from '@/components/SessionProvider';
 import { UserProvider } from './context/userContext';
 
+import { Toaster } from "sonner";
+
+
 
 
 const jetbrainsMono = JetBrains_Mono({
@@ -18,6 +21,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata = {
   title: "Car+ | Find Nearby Mechanics and Roadside Assistance",
   description: "Car+ helps drivers find nearby mechanics and roadside assistance quickly using an interactive map. Get the help you need for car breakdowns and emergencies with ease.",
+  siteName: "Car+",
+  icons:{
+    icon: '/favicon.svg'
+  }
 };
 
 
@@ -33,6 +40,7 @@ export default  function RootLayout({ children }) {
                 <Nav/>
                   {children}
                 <Footer/>
+                <Toaster position="top-center" richColors />
                 </UserProvider>
               </Provider>
             </body>
