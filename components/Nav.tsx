@@ -12,6 +12,7 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
 
 import { motion } from "motion/react";
+import { toast } from "sonner";
 import Image from "next/image";
 
   const Nav = () => {
@@ -67,6 +68,55 @@ import Image from "next/image";
   }, [status, session?.user?.email]);
   
 
+  const acceptRequest = async (note: Notification) => {
+    try {
+      const response = await fetch("/api/accept-request", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          driverName: note.driverName,
+          driverEmail: note.driverEmail,
+          rescuerEmail: note.rescuerEmail,
+        })});
+
+        const data = await response.json();
+        if (response.ok){
+          toast.success(data.message);
+          setNotifications((prev) =>
+            prev.filter((n) => n.driverEmail !== note.driverEmail)
+          ); 
+        }else{
+          toast.error(data.message);
+        }
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
+  }
+
+  const rejectRequest = async (note: Notification) => {
+    try {
+      const response = await fetch("/api/reject-request", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          driverName: note.driverName,
+          driverEmail: note.driverEmail,
+          rescuerEmail: note.rescuerEmail,
+        })});
+
+        const data = await response.json();
+        if (response.ok){
+          toast.success(data.message);
+          setNotifications((prev) =>
+            prev.filter((n) => n.driverEmail !== note.driverEmail)
+          ); 
+        }else{
+          toast.error(data.message);
+        }
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+    }
+  }
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -75,7 +125,7 @@ import Image from "next/image";
         transition: { delay: 0.8, duration: 0.6, ease: "easeIn" },
       }}
     >
-      <nav className="flex justify-between items-center">
+      <nav className="fixed top-0 left-0 w-full px-4 xl:px-8 py-3 bg-primary z-50 flex justify-between items-center">
         <Link href="/" className="text-4xl inline-flex gap-1">
           <span>Car</span>
           <span className="text-accent">+</span>
@@ -122,16 +172,17 @@ import Image from "next/image";
                     <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[500px] z-50 p-2">
                       {notifications.length > 0 ? (
                         notifications.map((note,index) => (
+                          (note.status === "pending") &&
                           <div
                             key={index}
                             className="text-sm py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between   items-center"
                           >
                             <p>New Request from {note.driverName}</p>
                             <div className="flex gap-2">
-                              <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition">
+                              <button className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition" onClick={() => acceptRequest(note)}>
                                 <FaCheck />
                               </button>
-                              <button className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 transition">
+                              <button className="flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 transition" onClick={() => rejectRequest(note)}>
                                 <FaTimes />
                               </button>
                             </div>

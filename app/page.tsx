@@ -30,7 +30,7 @@ const Home = () => {
       opacity:1,
       transition:{delay:0.8, duration:0.6, ease: "easeIn"}
     }}>
-    <div className="flex flex-col items-center justify-center gap-12 xl:flex-row xl:justify-between pt-12">
+    <div className="flex flex-col items-center justify-center gap-12 xl:flex-row xl:justify-between pt-16">
       <div className="flex flex-col gap-4 w-full xl:w-2/3 text-center xl:text-left items-center xl:items-start">
         <h1 className="text-4xl md:text-7xl font-semibold">
           <span className="text-accent">Fast Assistance</span> When You Need It

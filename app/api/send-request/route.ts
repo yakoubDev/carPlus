@@ -25,6 +25,18 @@ export async function POST(req: Request) {
 
     await connectToDB();
 
+    const existRequest = await RescueRequest.findOne({
+      driverEmail,
+      rescuerEmail,
+      status: "pending",
+    })
+
+    if (existRequest) {
+      return NextResponse.json(
+        { message: "You have a pending request" },
+        { status: 400 }
+      );
+    }
     const newRequest = await RescueRequest.create({
       driverName,
       driverPhone,

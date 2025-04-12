@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     await connectToDB();
 
     const notifications = await RescueRequest
-      .find({ rescuerEmail: email })
+      .find({ rescuerEmail: email, status: "pending" })
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ notifications }, { status: 200 });
