@@ -51,6 +51,12 @@ export default function Assist() {
   const [requesting, setRequesting] = useState<string | null>(null);
   const mapRef = React.useRef<any>(null); // Create a reference for the map
 
+  const [showModal, setShowModal] = useState(false);
+  const [selectedEmergency, setSelectedEmergency] = useState("");
+  const [customMessage, setCustomMessage] = useState("");
+  const [pendingService, setPendingService] = useState<RescueService | null>(
+    null
+  );
   const handleSelectService = (service: RescueService) => {
     setSelectedService(service);
 
@@ -156,6 +162,13 @@ export default function Assist() {
 
   const handleServiceRequest = async (service: RescueService) => {
     if (requesting === service.email) return; // Prevent duplicate request to the same service
+    const message =
+      selectedEmergency === "Other" ? customMessage : selectedEmergency;
+
+    if (!message) {
+      toast.error("Please provide an emergency description.");
+      return;
+    }
 
     setRequesting(service.email); // Mark this service as being requested
     try {
@@ -171,14 +184,14 @@ export default function Assist() {
             longitude: service?.location.longitude,
           },
           rescuerEmail: service.email,
+          rescuerName: service.name,
+          message: message,
         }),
       });
 
       const result = await response.json();
       if (response.ok) {
         toast.success(`Request sent to ${service.name}`);
-
-        // Optionally disable all requests for 5 seconds
         setTimeout(() => {
           setRequesting(null);
         }, 5000);
@@ -358,11 +371,16 @@ export default function Assist() {
                               ? "opacity-50 cursor-not-allowed"
                               : ""
                           }`}
-                          onClick={() => handleServiceRequest(service)}
+                          onClick={() => {
+                            setPendingService(service);
+                            setShowModal(true);
+                          }}
                         >
-                          {requesting === service.email
-                            ? <FaCheck/>
-                            : "Request"}
+                          {requesting === service.email ? (
+                            <FaCheck />
+                          ) : (
+                            "Request"
+                          )}
                         </button>
                       </div>
                     </div>
@@ -373,6 +391,66 @@ export default function Assist() {
             )}
           </ul>
         </ScrollArea>
+        {showModal && pendingService && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+            <div className="bg-primary text-white rounded-xl p-6 w-[90%] max-w-md">
+              <h2 className="text-xl font-bold mb-4">Select Emergency</h2>
+
+              <select
+                value={selectedEmergency}
+                onChange={(e) => setSelectedEmergency(e.target.value)}
+                className="w-full p-2 rounded border mb-4 bg-primary focus:outline-none focus:border-accent"
+              >
+                <option value="">-- Select Emergency --</option>
+                <option value="Tire Change">Tire Change</option>
+                <option value="Battery Boost">Battery Boost</option>
+                <option value="Fuel Delivery">Fuel Delivery</option>
+                <option value="Locked Out">Locked Out</option>
+                <option value="Other">Other...</option>
+              </select>
+
+              {selectedEmergency === "Other" && (
+                <textarea
+                  placeholder="Describe your emergency..."
+                  className="w-full p-2 rounded border mb-4 bg-primary text-white focus:border-accent"
+                  rows={3}
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                />
+              )}
+
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-4 py-2 bg-red-400 hover:bg-red-500 rounded text-black"
+                  onClick={() => {
+                    setShowModal(false);
+                    setSelectedEmergency("");
+                    setCustomMessage("");
+                    setPendingService(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-accent rounded text-black"
+                  onClick={() => {
+                    if (!selectedEmergency) {
+                      toast.error("Please select an emergency type.");
+                      return;
+                    }
+                    handleServiceRequest(pendingService);
+                    setShowModal(false);
+                    setSelectedEmergency("");
+                    setCustomMessage("");
+                    setPendingService(null);
+                  }}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     </section>
   );

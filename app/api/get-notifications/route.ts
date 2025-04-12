@@ -12,9 +12,10 @@ export async function GET(req: NextRequest) {
   try {
     await connectToDB();
 
-    const notifications = await RescueRequest
-      .find({ rescuerEmail: email, status: "pending" })
-      .sort({ createdAt: -1 });
+    const notifications = await RescueRequest.find({
+      $or: [{ rescuerEmail: email }, { driverEmail: email }],
+    }).sort({ createdAt: -1 });
+    
 
     return NextResponse.json({ notifications }, { status: 200 });
   } catch (error) {

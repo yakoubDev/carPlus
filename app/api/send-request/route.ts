@@ -14,6 +14,8 @@ export async function POST(req: Request) {
       driverEmail,
       location, // { latitude, longitude }
       rescuerEmail,
+      rescuerName,
+      message,
     } = body;
 
     if (!driverName || !driverPhone || !driverEmail || !location || !rescuerEmail) {
@@ -43,6 +45,8 @@ export async function POST(req: Request) {
       driverEmail,
       location,
       rescuerEmail,
+      rescuerName,
+      message
     });
 
     return NextResponse.json(
