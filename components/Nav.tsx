@@ -159,11 +159,11 @@ const Nav = () => {
                     <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[500px] z-50 p-2">
                       {filteredNotifications.length > 0 ? (
                         filteredNotifications.map((note, index) => (
-                          <div key={index} className="text-sm py-4 px-2 hover:bg-gray-200 text-white hover:text-black cursor-pointer flex justify-between items-center">
+                          <div key={index} className="text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white cursor-pointer flex justify-between items-center">
                             {note.status === "pending" ? (
                               <>
                                 <div>
-                                  <p>{note.driverName} needs your help!</p>
+                                <p><span className="text-accent">{note.driverName}</span> needs your help!</p>
                                   <p><span className="text-red-500 font-semibold">Problem:</span> {note.message}</p>
                                 </div>
                                 <div className="flex gap-2">
@@ -172,7 +172,7 @@ const Nav = () => {
                                 </div>
                               </>
                             ) : (
-                              <p>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
+                              <p className={`${note.status === "accepted" ? "text-green-500" : "text-red-500"}`}>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
                             )}
                           </div>
                         ))
@@ -214,11 +214,11 @@ const Nav = () => {
                 <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
                   {filteredNotifications.length > 0 ? (
                     filteredNotifications.map((note, index) => (
-                      <div key={index} className="text-xs py-4 px-2 hover:bg-gray-600 text-white cursor-pointer flex justify-between items-center">
+                      <div key={index} className="text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white cursor-pointer flex justify-between items-center">
                         {note.status === "pending" ? (
                           <>
                             <div>
-                              <p>{note.driverName} needs your help!</p>
+                              <p><span className="text-accent">{note.driverName}</span> needs your help!</p>
                               <p><span className="text-red-500 font-semibold">Problem:</span> {note.message}</p>
                             </div>
                             <div className="flex gap-2">
