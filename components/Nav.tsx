@@ -13,6 +13,7 @@ import { FaCheck, FaTimes, FaBell } from "react-icons/fa";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import Image from "next/image";
+import Email from "next-auth/providers/email";
 
 const Nav = () => {
   type Notification = {
@@ -46,7 +47,9 @@ const Nav = () => {
     const getNotifications = async () => {
       if (session?.user?.email) {
         try {
-          const response = await fetch(`/api/get-notifications?email=${session.user.email}`);
+          const response = await fetch(
+            `/api/get-notifications?email=${session.user.email}`
+          );
           const data = await response.json();
           if (response.ok) {
             setNotifications(data.notifications);
@@ -62,7 +65,8 @@ const Nav = () => {
   }, [status, session?.user?.email]);
 
   const filteredNotifications = notifications.filter((notif) => {
-    const isPendingForRescuer = notif.status === "pending" && notif.rescuerEmail === session?.user.email;
+    const isPendingForRescuer =
+      notif.status === "pending" && notif.rescuerEmail === session?.user.email;
     const isAcceptedForDriver =
       (notif.status === "accepted" || notif.status === "rejected") &&
       notif.driverEmail === session?.user.email;
@@ -71,7 +75,7 @@ const Nav = () => {
 
   const notificationCount = filteredNotifications.length;
 
-  const acceptRequest = async (note: Notification) => {
+  const acceptRequest = async (note: Notification, index: Number) => {
     try {
       const response = await fetch("/api/accept-request", {
         method: "PATCH",
@@ -86,7 +90,7 @@ const Nav = () => {
       const data = await response.json();
       if (response.ok) {
         toast.success(data.message);
-        setNotifications((prev) => prev.filter((n) => n.id !== note.id));
+        setNotifications((prev) => prev.filter((_,i) => i !== index));
       } else {
         toast.error(data.message);
       }
@@ -95,7 +99,7 @@ const Nav = () => {
     }
   };
 
-  const rejectRequest = async (note: Notification) => {
+  const rejectRequest = async (note: Notification,index: Number) => {
     try {
       const response = await fetch("/api/reject-request", {
         method: "PATCH",
@@ -110,7 +114,7 @@ const Nav = () => {
       const data = await response.json();
       if (response.ok) {
         toast.success(data.message);
-        setNotifications((prev) => prev.filter((n) => n.id !== note.id));
+        setNotifications((prev) => prev.filter((_,i) => i !== index));
       } else {
         toast.error(data.message);
       }
@@ -119,8 +123,34 @@ const Nav = () => {
     }
   };
 
+  const clearNotifications = async () => {
+    try {
+      const response = await fetch("/api/clear-notifications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: session?.user?.email,
+        })},
+      )
+
+      const data = await response.json();
+      if (response.ok) {
+        setNotifications((prev) => prev.filter((n) => n.status === "pending"));
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.8, duration: 0.6, ease: "easeIn" } }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{
+        opacity: 1,
+        transition: { delay: 0.8, duration: 0.6, ease: "easeIn" },
+      }}
+    >
       <nav className="fixed top-0 left-0 w-full px-4 xl:px-8 py-3 bg-primary z-50 flex justify-between items-center">
         <Link href="/" className="text-4xl inline-flex gap-1">
           <span>Car</span>
@@ -133,7 +163,9 @@ const Nav = () => {
             <Link
               href={link.path}
               key={index}
-              className={`${link.path === pathname && "text-accent border-b-2 border-accent"} font-medium hover:text-accent transition-all`}
+              className={`${
+                link.path === pathname && "text-accent border-b-2 border-accent"
+              } font-medium hover:text-accent transition-all`}
             >
               {link.name}
             </Link>
@@ -142,7 +174,12 @@ const Nav = () => {
           <div className="flex gap-4 items-center ml-8 relative">
             {session?.user ? (
               <>
-                <button className="button" onClick={() => signOut({ callbackUrl: "/" })}>Logout</button>
+                <button
+                  className="button"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  Logout
+                </button>
 
                 <div className="relative flex">
                   <FaBell
@@ -156,32 +193,83 @@ const Nav = () => {
                   )}
 
                   {showNotifications && (
-                    <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[400px] z-50 p-2">
+                    <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[400px] max-h-[400px] overflow-y-auto z-50 p-2">
                       <div className="flex justify-between items-center w-full">
-                        <h1 className="text-lg font-semibold px-2 text-white">Notifications</h1>
-                        <p className="text-sm text-white px-2 cursor-pointer underline-offset-1 underline opacity-60 hover:opacity-90" onClick={() => setNotifications([])}>Clear</p>
+                        <h1 className="text-lg font-semibold px-2 text-white">
+                          Notifications
+                        </h1>
+                        <p
+                          className="text-sm text-white px-2 cursor-pointer underline-offset-1 underline opacity-60 hover:opacity-90"
+                          onClick={() => clearNotifications()}
+                        >
+                          Clear
+                        </p>
                       </div>
                       {filteredNotifications.length > 0 ? (
                         filteredNotifications.map((note, index) => (
-                          <div key={index} className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${filteredNotifications[index] === filteredNotifications[filteredNotifications.length - 1] ? "" : "border-b-[1px] border-white/60"}`}>
+                          <div
+                            key={index}
+                            className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${
+                              filteredNotifications[index] ===
+                              filteredNotifications[
+                                filteredNotifications.length - 1
+                              ]
+                                ? ""
+                                : "border-b-[1px] border-white/60"
+                            }`}
+                          >
                             {note.status === "pending" ? (
                               <>
                                 <div>
-                                <p><span className="text-accent">{note.driverName}</span> needs your help!</p>
-                                  <p><span className="text-red-500 font-semibold">Problem:</span> {note.message}</p>
+                                  <p>
+                                    <span className="text-accent">
+                                      {note.driverName}
+                                    </span>{" "}
+                                    needs your help!
+                                  </p>
+                                  <p>
+                                    <span className="text-red-500 font-semibold">
+                                      Problem:
+                                    </span>{" "}
+                                    {note.message}
+                                  </p>
                                 </div>
                                 <div className="flex gap-2">
-                                  <button className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600" onClick={() => acceptRequest(note)}><FaCheck /></button>
-                                  <button className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600" onClick={() => rejectRequest(note)}><FaTimes /></button>
+                                  <button
+                                    className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
+                                    onClick={() => acceptRequest(note,index)}
+                                  >
+                                    <FaCheck />
+                                  </button>
+                                  <button
+                                    className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+                                    onClick={() => rejectRequest(note,index)}
+                                  >
+                                    <FaTimes />
+                                  </button>
                                 </div>
                               </>
                             ) : (
-                              <p className={`${note.status === "accepted" ? "text-green-500" : "text-red-500"}`}>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
+                              <p
+                                className={`${
+                                  note.status === "accepted"
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }`}
+                              >
+                                {note.rescuerName}{" "}
+                                {note.status === "accepted"
+                                  ? "accepted"
+                                  : "rejected"}{" "}
+                                your request!
+                              </p>
                             )}
                           </div>
                         ))
                       ) : (
-                        <div className="text-sm text-gray-500 px-2 py-2">No new notifications</div>
+                        <div className="text-sm text-gray-500 px-2 py-2">
+                          No new notifications
+                        </div>
                       )}
                     </div>
                   )}
@@ -189,14 +277,25 @@ const Nav = () => {
 
                 <Link href={"/complete-profile"}>
                   {session.user.image ? (
-                    <Image src={session.user.image} alt="profile" width={40} height={40} className="rounded-full" />
+                    <Image
+                      src={session.user.image}
+                      alt="profile"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
                   ) : (
                     <CgProfile className="text-[40px] hover:text-accent transition-all" />
                   )}
                 </Link>
               </>
             ) : (
-              <button className="button" onClick={() => signIn("google", { callbackUrl: "/" })}>Login</button>
+              <button
+                className="button"
+                onClick={() => signIn("google", { callbackUrl: "/" })}
+              >
+                Login
+              </button>
             )}
           </div>
         </div>
@@ -215,28 +314,83 @@ const Nav = () => {
                 </span>
               )}
               {showNotifications && (
-                <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[370px] z-50 p-2">
+                <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[380px] max-h-[400px] overflow-y-auto z-50 p-2">
+                  <div className="flex justify-between items-center w-full">
+                    <h1 className="text-lg font-semibold px-2 text-white">
+                      Notifications
+                    </h1>
+                    <p
+                      className="text-sm text-white px-2 cursor-pointer underline-offset-1 underline opacity-60 hover:opacity-90"
+                      onClick={() => clearNotifications()}
+                    >
+                      Clear
+                    </p>
+                  </div>
                   {filteredNotifications.length > 0 ? (
                     filteredNotifications.map((note, index) => (
-                      <div key={index} className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${filteredNotifications[index] === filteredNotifications[filteredNotifications.length - 1] ? "" : "border-b-[1px] border-white/60"}`}>
+                      <div
+                        key={index}
+                        className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${
+                          filteredNotifications[index] ===
+                          filteredNotifications[
+                            filteredNotifications.length - 1
+                          ]
+                            ? ""
+                            : "border-b-[1px] border-white/60"
+                        }`}
+                      >
                         {note.status === "pending" ? (
                           <>
                             <div>
-                              <p><span className="text-accent">{note.driverName}</span> needs your help!</p>
-                              <p><span className="text-red-500 font-semibold">Problem:</span> {note.message}</p>
+                              <p>
+                                <span className="text-accent">
+                                  {note.driverName}
+                                </span>{" "}
+                                needs your help!
+                              </p>
+                              <p>
+                                <span className="text-red-500 font-semibold">
+                                  Problem:
+                                </span>{" "}
+                                {note.message}
+                              </p>
                             </div>
                             <div className="flex gap-2">
-                              <button className="bg-green-500 text-white px-2 py-1 rounded" onClick={() => acceptRequest(note)}><FaCheck /></button>
-                              <button className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded" onClick={() => rejectRequest(note)}><FaTimes /></button>
+                              <button
+                                className="bg-green-500 text-white px-2 py-2 rounded"
+                                onClick={() => acceptRequest(note,index)}
+                              >
+                                <FaCheck />
+                              </button>
+                              <button
+                                className="bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded"
+                                onClick={() => rejectRequest(note,index)}
+                              >
+                                <FaTimes />
+                              </button>
                             </div>
                           </>
                         ) : (
-                          <p className={`${note.status === "accepted" ? "text-green-500" : "text-red-500"} m-auto`}>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
+                          <p
+                            className={`${
+                              note.status === "accepted"
+                                ? "text-green-500"
+                                : "text-red-500"
+                            } m-auto`}
+                          >
+                            {note.rescuerName}{" "}
+                            {note.status === "accepted"
+                              ? "accepted"
+                              : "rejected"}{" "}
+                            your request!
+                          </p>
                         )}
                       </div>
                     ))
                   ) : (
-                    <div className="text-sm text-gray-500 px-2 py-2">No new notifications</div>
+                    <div className="text-sm text-gray-500 px-2 py-2">
+                      No new notifications
+                    </div>
                   )}
                 </div>
               )}
@@ -246,7 +400,13 @@ const Nav = () => {
           {session?.user && (
             <Link href={"/complete-profile"}>
               {session.user.image ? (
-                <Image src={session.user.image} alt="profile" width={40} height={40} className="rounded-full" />
+                <Image
+                  src={session.user.image}
+                  alt="profile"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
               ) : (
                 <CgProfile className="text-[34px] hover:text-accent transition-all" />
               )}
@@ -254,18 +414,31 @@ const Nav = () => {
           )}
 
           {toggleMenu ? (
-            <IoMdClose className="text-[32px] text-accent" onClick={() => setToggleMenu(!toggleMenu)} />
+            <IoMdClose
+              className="text-[32px] text-accent"
+              onClick={() => setToggleMenu(!toggleMenu)}
+            />
           ) : (
-            <CiMenuFries className="text-[32px] text-accent" onClick={() => setToggleMenu(!toggleMenu)} />
+            <CiMenuFries
+              className="text-[32px] text-accent"
+              onClick={() => setToggleMenu(!toggleMenu)}
+            />
           )}
         </div>
 
         {toggleMenu && (
           <div className="bg-primary w-[60%] py-4 fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
             <div className="flex justify-end items-center w-full px-4">
-              <IoMdClose className="text-[32px] text-accent" onClick={() => setToggleMenu(false)} />
+              <IoMdClose
+                className="text-[32px] text-accent"
+                onClick={() => setToggleMenu(false)}
+              />
             </div>
-            <Link href="/" className="text-4xl inline-flex gap-1" onClick={() => setToggleMenu(false)}>
+            <Link
+              href="/"
+              className="text-4xl inline-flex gap-1"
+              onClick={() => setToggleMenu(false)}
+            >
               <span>Car</span>
               <span className="text-accent">+ </span>
             </Link>
@@ -274,15 +447,28 @@ const Nav = () => {
                 href={link.path}
                 key={index}
                 onClick={() => setToggleMenu(false)}
-                className={`${link.path === pathname && "text-accent border-b-2 border-accent"} font-medium hover:text-accent transition-all`}
+                className={`${
+                  link.path === pathname &&
+                  "text-accent border-b-2 border-accent"
+                } font-medium hover:text-accent transition-all`}
               >
                 {link.name}
               </Link>
             ))}
             {session?.user ? (
-              <button className="button" onClick={() => signOut({ callbackUrl: "/" })}>Logout</button>
+              <button
+                className="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Logout
+              </button>
             ) : (
-              <button className="button" onClick={() => signIn("google", { callbackUrl: "/" })}>Login</button>
+              <button
+                className="button"
+                onClick={() => signIn("google", { callbackUrl: "/" })}
+              >
+                Login
+              </button>
             )}
           </div>
         )}

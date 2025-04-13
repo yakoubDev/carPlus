@@ -225,11 +225,6 @@ export default function Assist() {
               key={index}
               latitude={Number(service.location.latitude)}
               longitude={Number(service.location.longitude)}
-              // color={
-              //   ["Mechanic"].includes(service.role)
-              //     ? "orange"
-              //     : "green"
-              // }
               onClick={(e) => {
                 e.originalEvent.stopPropagation(); // Prevent event bubbling
                 setSelectedService(service);
