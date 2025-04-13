@@ -159,7 +159,7 @@ const Nav = () => {
                     <div className="absolute top-10 right-0 bg-primary shadow-lg border rounded-md w-[500px] z-50 p-2">
                       {filteredNotifications.length > 0 ? (
                         filteredNotifications.map((note, index) => (
-                          <div key={index} className="text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white cursor-pointer flex justify-between items-center">
+                          <div key={index} className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${filteredNotifications[index] === filteredNotifications[filteredNotifications.length - 1] ? "" : "border-b-[1px] border-white/60"}`}>
                             {note.status === "pending" ? (
                               <>
                                 <div>
@@ -214,7 +214,7 @@ const Nav = () => {
                 <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[360px] z-50 p-2">
                   {filteredNotifications.length > 0 ? (
                     filteredNotifications.map((note, index) => (
-                      <div key={index} className="text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white cursor-pointer flex justify-between items-center">
+                      <div key={index} className={`text-sm py-4 px-2 opacity-85 hover:opacity-100 text-white hover:bg-white/10 cursor-pointer flex justify-between items-center ${filteredNotifications[index] === filteredNotifications[filteredNotifications.length - 1] ? "" : "border-b-[1px] border-white/60"}`}>
                         {note.status === "pending" ? (
                           <>
                             <div>
@@ -227,7 +227,7 @@ const Nav = () => {
                             </div>
                           </>
                         ) : (
-                          <p>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
+                          <p className={`${note.status === "accepted" ? "text-green-500" : "text-red-500"}`}>{note.rescuerName} {note.status === "accepted" ? "accepted" : "rejected"} your help!</p>
                         )}
                       </div>
                     ))
