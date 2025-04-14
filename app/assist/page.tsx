@@ -144,10 +144,15 @@ export default function Assist() {
   }, [user.location, selectedRadius]);
 
   const filteredServices = services.filter((service) => {
-    if (filters.roadAssist && service.role === "Road Assist") return true;
-    if (filters.mechanic && service.role === "Mechanic") return true;
-    return false;
+    const isMatchingRole =
+      (filters.roadAssist && service.role === "Road Assist") ||
+      (filters.mechanic && service.role === "Mechanic");
+  
+    const isNotCurrentUser = service.email !== user?.email;
+  
+    return isMatchingRole && isNotCurrentUser;
   });
+  
 
   const handleFilterChange = (type: keyof Filters) => {
     setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
@@ -207,7 +212,7 @@ export default function Assist() {
   };
 
   return (
-    <section className="w-full mt-8 flex flex-col lg:flex-row gap-4 items-center lg:items-start">
+    <section className="w-full mt-14 flex flex-col lg:flex-row gap-4 items-center lg:items-start">
       {/* Map */}
       <div id="map_container" className="w-[95%] xl:w-1/2">
         <Map
@@ -335,54 +340,47 @@ export default function Assist() {
         <ScrollArea className="h-[450px]">
           <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
             {filteredServices.length > 0 ? (
-              filteredServices.map(
-                (service, index) =>
-                  service.name !== user?.name && (
-                    <div
-                      key={index}
-                      className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
-                      onClick={() => handleSelectService(service)}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-accent">
-                          Name:{" "}
-                          <span className="text-white">{service.name}</span>
-                        </span>
-                        <span className="text-accent">
-                          Phone:{" "}
-                          <span className="text-white">{service.phone}</span>
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-accent">
-                          Type:{" "}
-                          <span className="text-white">{service.role}</span>
-                        </span>
-                        <button
-                          disabled={requesting === service.email}
-                          className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
-                            requesting === service.email
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
-                          onClick={() => {
-                            setPendingService(service);
-                            setShowModal(true);
-                          }}
-                        >
-                          {requesting === service.email ? (
-                            <FaCheck />
-                          ) : (
-                            "Request"
-                          )}
-                        </button>
-                      </div>
+              filteredServices
+                .map((service, index) => (
+                  <li
+                    key={index}
+                    className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
+                    onClick={() => handleSelectService(service)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-accent">
+                        Name: <span className="text-white">{service.name}</span>
+                      </span>
+                      <span className="text-accent">
+                        Phone:{" "}
+                        <span className="text-white">{service.phone}</span>
+                      </span>
                     </div>
-                  )
-              )
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-accent">
+                        Type: <span className="text-white">{service.role}</span>
+                      </span>
+                      <button
+                        disabled={requesting === service.email}
+                        className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
+                          requesting === service.email
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPendingService(service);
+                          setShowModal(true);
+                        }}
+                      >
+                        {requesting === service.email ? <FaCheck /> : "Request"}
+                      </button>
+                    </div>
+                  </li>
+                ))
             ) : (
-              <div className="text-white">No services available.</div>
+              <li className="text-white">No services available.</li>
             )}
           </ul>
         </ScrollArea>

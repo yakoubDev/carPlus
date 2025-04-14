@@ -46,7 +46,7 @@ export async function DELETE(req: NextRequest) {
 
     // The user is a rescuer
     const result = await RescueRequest.deleteMany({
-      rescuerEmail: userEmail,
+      driverEmail: userEmail,
       status: { $in: ["accepted", "rejected"] },
     });
 

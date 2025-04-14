@@ -62,20 +62,25 @@ const Nav = () => {
       }
     };
     getNotifications();
+
+    const interval = setInterval(getNotifications, 30000); // poll every 30s
+    return () => clearInterval(interval);
   }, [status, session?.user?.email]);
 
   const filteredNotifications = notifications.filter((notif) => {
-    const isPendingForRescuer =
-      notif.status === "pending" && notif.rescuerEmail === session?.user.email;
-    const isAcceptedForDriver =
-      (notif.status === "accepted" || notif.status === "rejected") &&
-      notif.driverEmail === session?.user.email;
-    return isPendingForRescuer || isAcceptedForDriver;
+    const email = session?.user.email;
+    if (!email) return false;
+
+    return (
+      (notif.status === "pending" && notif.rescuerEmail === email) ||
+      ((notif.status === "accepted" || notif.status === "rejected") &&
+        notif.driverEmail === email)
+    );
   });
 
   const notificationCount = filteredNotifications.length;
 
-  const acceptRequest = async (note: Notification, index: Number) => {
+  const acceptRequest = async (note: Notification, index: number) => {
     try {
       const response = await fetch("/api/accept-request", {
         method: "PATCH",
@@ -90,7 +95,21 @@ const Nav = () => {
       const data = await response.json();
       if (response.ok) {
         toast.success(data.message);
-        setNotifications((prev) => prev.filter((_,i) => i !== index));
+        setNotifications((prev) => prev.filter((_, i) => i !== index));
+
+        // const userLocation = {
+        //   latitude: note.location.latitude,
+        //   longitude: note.location.longitude,
+        // };
+      
+        // // Navigate to the assist page, passing user location in query params
+        // router.push({
+        //   pathname: '/assist', // Your assist page route
+        //   query: {
+        //     latitude: userLocation.latitude,
+        //     longitude: userLocation.longitude,
+        //   },
+        // });
       } else {
         toast.error(data.message);
       }
@@ -99,7 +118,7 @@ const Nav = () => {
     }
   };
 
-  const rejectRequest = async (note: Notification,index: Number) => {
+  const rejectRequest = async (note: Notification, index: number) => {
     try {
       const response = await fetch("/api/reject-request", {
         method: "PATCH",
@@ -114,7 +133,7 @@ const Nav = () => {
       const data = await response.json();
       if (response.ok) {
         toast.success(data.message);
-        setNotifications((prev) => prev.filter((_,i) => i !== index));
+        setNotifications((prev) => prev.filter((_, i) => i !== index));
       } else {
         toast.error(data.message);
       }
@@ -130,19 +149,19 @@ const Nav = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userEmail: session?.user?.email,
-        })},
-      )
+        }),
+      });
 
       const data = await response.json();
       if (response.ok) {
         setNotifications((prev) => prev.filter((n) => n.status === "pending"));
-      }else{
+      } else {
         toast.error(data.message);
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -236,14 +255,16 @@ const Nav = () => {
                                 </div>
                                 <div className="flex gap-2">
                                   <button
+                                    aria-label="Accept Request"
                                     className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
-                                    onClick={() => acceptRequest(note,index)}
+                                    onClick={() => acceptRequest(note, index)}
                                   >
                                     <FaCheck />
                                   </button>
                                   <button
+                                    aria-label="Reject Request"
                                     className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
-                                    onClick={() => rejectRequest(note,index)}
+                                    onClick={() => rejectRequest(note, index)}
                                   >
                                     <FaTimes />
                                   </button>
@@ -357,14 +378,16 @@ const Nav = () => {
                             </div>
                             <div className="flex gap-2">
                               <button
+                                aria-label="Accept Request"
                                 className="bg-green-500 text-white px-2 py-2 rounded"
-                                onClick={() => acceptRequest(note,index)}
+                                onClick={() => acceptRequest(note, index)}
                               >
                                 <FaCheck />
                               </button>
                               <button
+                                aria-label="Reject Request"
                                 className="bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded"
-                                onClick={() => rejectRequest(note,index)}
+                                onClick={() => rejectRequest(note, index)}
                               >
                                 <FaTimes />
                               </button>
