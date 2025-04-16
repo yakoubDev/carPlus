@@ -20,6 +20,7 @@ export const UserProvider = ({ children }) => {
           longitude: session?.user.location.coordinates[0],
         }
       : { latitude: 0, longitude: 0 },
+    available: session?.user.available || false
   });
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export const UserProvider = ({ children }) => {
               longitude: session?.user.location.coordinates[0],
             }
           : { latitude: 0, longitude: 0 },
+        available: session?.user.available
       });
     }
   }, [session]);

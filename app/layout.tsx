@@ -8,6 +8,7 @@ import Provider from '@/components/SessionProvider';
 import { UserProvider } from './context/userContext';
 
 import { Toaster } from "sonner";
+import AvailableHandler from '@/components/AvailableHandler';
 
 
 
@@ -27,9 +28,12 @@ export const metadata = {
   }
 };
 
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
 
-
-export default  function RootLayout({ children }) {
+export default  function RootLayout({ children }: RootLayoutProps) {
+  
   return (
           <html lang="en">
             <body
@@ -37,6 +41,7 @@ export default  function RootLayout({ children }) {
               >
               <Provider>
                 <UserProvider> 
+                <AvailableHandler/>
                 <Nav/>
                   {children}
                 <Footer/>

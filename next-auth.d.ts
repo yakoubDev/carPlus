@@ -1,4 +1,3 @@
-// next-auth.d.ts
 import NextAuth from "next-auth";
 
 declare module "next-auth" {
@@ -9,6 +8,7 @@ declare module "next-auth" {
       image?: string | null;
       phone?: string;
       role?: string;
+      available?: boolean;
       location?: {
         type: "Point";
         coordinates: [number, number]; // [longitude, latitude]
@@ -19,6 +19,7 @@ declare module "next-auth" {
   interface User {
     phone?: string;
     role?: string;
+    available?: boolean;
     location?: {
       type: "Point";
       coordinates: [number, number]; // [longitude, latitude]

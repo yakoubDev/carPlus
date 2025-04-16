@@ -88,7 +88,6 @@ export default function Assist() {
   }, [searchParams]);
 
   React.useEffect(() => {
-    console.log(DriverLocation);
     if (mapRef.current && DriverLocation && mapLoaded) {
       mapRef.current.flyTo({
         center: [DriverLocation.lng, DriverLocation.lat],
@@ -172,7 +171,7 @@ export default function Assist() {
             },
           }));
           setServices(formattedData);
-          console.log("Available Services:", formattedData);
+          // console.log("Available Services:", formattedData);
         }
       } catch (error) {
         console.error("Operation failed:", error);

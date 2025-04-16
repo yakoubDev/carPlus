@@ -106,10 +106,12 @@ const Nav = () => {
         const userInfo = {
           name: note.driverName,
           phone: note.driverPhone,
-        }
-      
+        };
+
         // Navigate to the assist page, passing user location in query params
-        router.push(`/assist?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}&name=${userInfo.name}&phone=${userInfo.phone}`);
+        router.push(
+          `/assist?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}&name=${userInfo.name}&phone=${userInfo.phone}`
+        );
         setShowNotifications(false);
       } else {
         toast.error(data.message);
@@ -196,7 +198,10 @@ const Nav = () => {
               <>
                 <button
                   className="button"
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={async () => {
+                    await fetch("/api/disconnect", { method: "POST" });
+                    signOut({ callbackUrl: "/" });
+                  }}
                 >
                   Logout
                 </button>
@@ -482,7 +487,10 @@ const Nav = () => {
             {session?.user ? (
               <button
                 className="button"
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={async () => {
+                  await fetch("/api/disconnect", { method: "POST" });
+                  signOut({ callbackUrl: "/" });
+                }}
               >
                 Logout
               </button>

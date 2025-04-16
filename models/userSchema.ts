@@ -32,6 +32,10 @@ const userSchema = new Schema({
       required: true,
     },
   },
+  available:{
+    type: Boolean,
+    default: false
+  }
 });
 
 // Create a geospatial index

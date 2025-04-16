@@ -1,0 +1,32 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/authOptions"; // Adjust path to your authOptions
+import { connectToDB } from "@/utils/connectToDB";
+import User from "@/models/userSchema";
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ success: false }, { status: 401 });
+    }
+
+    await connectToDB();
+
+    const existUser = await User.findOneAndUpdate(
+      { email: session.user.email },
+      { $set: { available: false } },
+      { new: true } // Return the updated document
+    );
+
+    if (!existUser) {
+      return NextResponse.json({ success: false }, { status: 404 });
+    }
+
+    // If the update was successful, return a success response
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error disconnecting user:", error);
+    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+  }
+}

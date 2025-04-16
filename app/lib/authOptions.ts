@@ -32,7 +32,13 @@ export const authOptions: NextAuthOptions = {
             type: "Point",
             coordinates: [0, 0], // Default coordinates, can be updated later
           },
+          available:true,
         });
+      }
+
+      if (existUser) {
+        existUser.available = true;
+        await existUser.save();
       }
 
       return true;
@@ -49,6 +55,8 @@ export const authOptions: NextAuthOptions = {
         session.user.phone = dbUser.phone;
         session.user.role = dbUser.role;
         session.user.location = dbUser.location || { type: "Point", coordinates: [0, 0] }; // Ensure location is included
+        session.user.available = dbUser.available;
+
       }
 
       return session;
