@@ -16,7 +16,7 @@
 }
 
 .button{
-  @apply bg-accent flex items-center justify-center rounded-md text-base text-primary font-semibold transition-colors px-2 xl:px-6  py-2 outline-none;
+  @apply bg-accent flex items-center justify-center rounded-md text-sm xl:text-base text-primary font-semibold transition-colors px-1 xl:px-4  py-2 outline-none;
 }
 
 button:hover{

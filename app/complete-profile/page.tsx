@@ -52,7 +52,7 @@ const CompleteProfile = () => {
   };
 
   return (
-    <section className="mx-auto container flex justify-between items-center h-[80vh] mt-10">
+    <section className="mx-auto container flex justify-between items-center h-[80vh]  mt-10">
       <motion.div
         initial={{ opacity: 0, translateX: -200 }}
         whileInView={{
@@ -76,9 +76,9 @@ const CompleteProfile = () => {
           opacity: 1,
           transition: { delay: 0.5, duration: 0.6, ease: "easeIn" },
         }}
-        className="flex flex-col justify-center items-center p-8 bg-black/10 w-[650px] rounded-md shadow-md shadow-accent"
+        className="flex flex-col justify-center items-center py-2 xl:p-8 bg-black/10 w-full xl:w-[650px] rounded-md shadow-md shadow-accent"
       >
-        <h1 className="text-accent text-3xl xl:text-4xl font-semibold mb-4 text-center">
+        <h1 className="text-accent text-3xl xl:text-4xl font-semibold mt-2 text-center">
           Complete your profile!
         </h1>
 
@@ -121,7 +121,7 @@ const CompleteProfile = () => {
               onChange={(e) => setUser({ ...user, role: e.target.value })}
               className="input w-full border-none"
             >
-              <option value="">Select your account type</option>
+              <option value="">Select Role...</option>
               <option value="Driver">Driver</option>
               <option value="Mechanic">Mechanic</option>
               <option value="Road Assist">Road Assist</option>
@@ -133,8 +133,8 @@ const CompleteProfile = () => {
           </button>
         </form>
 
-        {success && <div className="text-green-500 text-xl">{success}</div>}
-        {error && <div className="text-red-500 text-xl">{error}</div>}
+        {true && <div className="text-green-500 text-center ">{success}</div>}
+        {error && <div className="text-red-500 text-center ">{error}</div>}
       </motion.div>
     </section>
   );

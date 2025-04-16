@@ -292,7 +292,7 @@ export default function Assist() {
               onClose={() => setSelectedService(null)} // Close popup on click
               closeOnClick
             >
-              <div className="p-2 bg-primary rounded shadow-md text-center flex flex-col items-center justify-center">
+              <div className="p-4 bg-primary rounded shadow-md text-center flex flex-col items-center justify-center">
                 <h3 className="text-base font-semibold text-accent">
                   {selectedService.name}
                 </h3>
@@ -337,7 +337,7 @@ export default function Assist() {
               onClose={() => setSelectedService(null)} // Close popup on click
               closeOnClick
             >
-              <div className="p-2 bg-primary rounded shadow-md text-center">
+              <div className="p-4 bg-primary rounded shadow-md text-center flex flex-col items-center justify-center">
                 <h3 className="text-base font-semibold text-accent">
                   Your Location
                 </h3>
@@ -363,7 +363,7 @@ export default function Assist() {
                   closeOnClick
                   onClose={() => setShowDriverPopup(false)}
                 >
-                  <div className="p-2 bg-primary rounded shadow-md text-center">
+                  <div className="p-3 bg-primary rounded shadow-md text-center flex flex-col items-center justify-center">
                     <h3 className="text-base font-semibold text-accent">
                       {driverInfo.name}
                     </h3>
@@ -454,7 +454,7 @@ export default function Assist() {
                     </span>
                     <button
                       disabled={requesting === service.email}
-                      className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
+                      className={`button bg-accent text-black font-semibold p-1 rounded hover:bg-opacity-80 transition-all ${
                         requesting === service.email
                           ? "opacity-50 cursor-not-allowed"
                           : ""
@@ -496,7 +496,7 @@ export default function Assist() {
               {selectedEmergency === "Other" && (
                 <textarea
                   placeholder="Describe your emergency..."
-                  className="w-full p-2 rounded border mb-4 bg-primary text-white focus:border-accent"
+                  className="w-full p-2 rounded  mb-4 bg-primary focus:outline-none focus:ring-1 focus:ring-accent text-white "
                   rows={3}
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
@@ -516,7 +516,8 @@ export default function Assist() {
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 bg-accent rounded text-black"
+                  className="px-4 py-2 bg-accent rounded text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!selectedEmergency || (selectedEmergency === "Other" && !customMessage)}
                   onClick={() => {
                     if (!selectedEmergency) {
                       toast.error("Please select an emergency type.");
