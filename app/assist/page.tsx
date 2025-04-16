@@ -292,7 +292,7 @@ export default function Assist() {
               onClose={() => setSelectedService(null)} // Close popup on click
               closeOnClick
             >
-              <div className="p-2 bg-primary rounded shadow-md text-center">
+              <div className="p-2 bg-primary rounded shadow-md text-center flex flex-col items-center justify-center">
                 <h3 className="text-base font-semibold text-accent">
                   {selectedService.name}
                 </h3>
