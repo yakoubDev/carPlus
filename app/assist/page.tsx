@@ -305,7 +305,7 @@ export default function Assist() {
                 </p>
                 <button
                       disabled={requesting === selectedService.email}
-                      className={`button bg-accent text-black font-semibold p-1 rounded hover:bg-opacity-80 transition-all ${
+                      className={`px-2 py-1 mt-2 bg-accent text-black font-semibold  rounded hover:bg-opacity-80 transition-all ${
                         requesting === selectedService.email
                           ? "opacity-50 cursor-not-allowed"
                           : ""

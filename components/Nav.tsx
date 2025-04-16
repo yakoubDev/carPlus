@@ -280,15 +280,13 @@ const Nav = () => {
                               <p
                                 className={`${
                                   note.status === "accepted"
-                                    ? "text-green-500"
+                                    ? "text-accent"
                                     : "text-red-500"
-                                }`}
+                                } m-auto`}
                               >
-                                {note.rescuerName}{" "}
                                 {note.status === "accepted"
-                                  ? "accepted"
-                                  : "rejected"}{" "}
-                                your request!
+                                  ? `✅ ${note.rescuerName} accepted your request!`
+                                  : `❌ ${note.rescuerName} rejected your request!`}
                               </p>
                             )}
                           </div>
@@ -403,15 +401,13 @@ const Nav = () => {
                           <p
                             className={`${
                               note.status === "accepted"
-                                ? "text-green-500"
+                                ? "text-accent"
                                 : "text-red-500"
                             } m-auto`}
                           >
-                            {note.rescuerName}{" "}
                             {note.status === "accepted"
-                              ? "accepted"
-                              : "rejected"}{" "}
-                            your request!
+                              ? `✅ ${note.rescuerName} accepted your request!`
+                              : `❌ ${note.rescuerName} rejected your request!`}
                           </p>
                         )}
                       </div>
