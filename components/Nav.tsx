@@ -282,7 +282,7 @@ const Nav = () => {
                                   note.status === "accepted"
                                     ? "text-accent"
                                     : "text-red-500"
-                                } m-auto`}
+                                } text-left`}
                               >
                                 {note.status === "accepted"
                                   ? `✅ ${note.rescuerName} accepted your request!`
@@ -403,7 +403,7 @@ const Nav = () => {
                               note.status === "accepted"
                                 ? "text-accent"
                                 : "text-red-500"
-                            } m-auto`}
+                            } text-left`}
                           >
                             {note.status === "accepted"
                               ? `✅ ${note.rescuerName} accepted your request!`
