@@ -40,7 +40,7 @@ export default  function RootLayout({ children }) {
                 <Nav/>
                   {children}
                 <Footer/>
-                <Toaster position="top-center" richColors />
+                <Toaster position="bottom-center" richColors />
                 </UserProvider>
               </Provider>
             </body>

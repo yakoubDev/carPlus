@@ -14,6 +14,7 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 import Image from "next/image";
 import Email from "next-auth/providers/email";
+import { useRouter } from "next/navigation";
 
 const Nav = () => {
   type Notification = {
@@ -32,6 +33,7 @@ const Nav = () => {
   };
 
   const pathname = usePathname();
+  const router = useRouter();
   const links = [
     { name: "Home", path: "/" },
     { name: "Process", path: `${pathname === "/" ? "#process" : "/#process"}` },
@@ -97,19 +99,18 @@ const Nav = () => {
         toast.success(data.message);
         setNotifications((prev) => prev.filter((_, i) => i !== index));
 
-        // const userLocation = {
-        //   latitude: note.location.latitude,
-        //   longitude: note.location.longitude,
-        // };
+        const userLocation = {
+          latitude: note.location.latitude,
+          longitude: note.location.longitude,
+        };
+        const userInfo = {
+          name: note.driverName,
+          phone: note.driverPhone,
+        }
       
-        // // Navigate to the assist page, passing user location in query params
-        // router.push({
-        //   pathname: '/assist', // Your assist page route
-        //   query: {
-        //     latitude: userLocation.latitude,
-        //     longitude: userLocation.longitude,
-        //   },
-        // });
+        // Navigate to the assist page, passing user location in query params
+        router.push(`/assist?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}&name=${userInfo.name}&phone=${userInfo.phone}`);
+        setShowNotifications(false);
       } else {
         toast.error(data.message);
       }

@@ -9,6 +9,8 @@ import { FaCheck, FaSpinner } from "react-icons/fa";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "../context/userContext";
+import { useSearchParams } from "next/navigation";
+import { set } from "mongoose";
 
 type RescueService = {
   name: string;
@@ -57,6 +59,45 @@ export default function Assist() {
   const [pendingService, setPendingService] = useState<RescueService | null>(
     null
   );
+
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const searchParams = useSearchParams();
+  const [DriverLocation, setDriverLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [driverInfo, setDriverInfo] = useState<{
+    name: string;
+    phone: string;
+  } | null>(null);
+  const [showDriverPopup, setShowDriverPopup] = useState<boolean>(true);
+
+  React.useEffect(() => {
+    const lat = searchParams.get("latitude");
+    const lng = searchParams.get("longitude");
+    const name = searchParams.get("name");
+    const phone = searchParams.get("phone");
+
+    if (lat && lng) {
+      setDriverLocation({ lat: parseFloat(lat), lng: parseFloat(lng) });
+    }
+
+    if (name && phone) {
+      setDriverInfo({ name, phone });
+    }
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    console.log(DriverLocation);
+    if (mapRef.current && DriverLocation && mapLoaded) {
+      mapRef.current.flyTo({
+        center: [DriverLocation.lng, DriverLocation.lat],
+        zoom: 14,
+        essential: true,
+      });
+    }
+  }, [DriverLocation, mapLoaded]);
+
   const handleSelectService = (service: RescueService) => {
     setSelectedService(service);
 
@@ -147,12 +188,11 @@ export default function Assist() {
     const isMatchingRole =
       (filters.roadAssist && service.role === "Road Assist") ||
       (filters.mechanic && service.role === "Mechanic");
-  
+
     const isNotCurrentUser = service.email !== user?.email;
-  
+
     return isMatchingRole && isNotCurrentUser;
   });
-  
 
   const handleFilterChange = (type: keyof Filters) => {
     setFilters((prev) => ({ ...prev, [type]: !prev[type] }));
@@ -217,6 +257,7 @@ export default function Assist() {
       <div id="map_container" className="w-[95%] xl:w-1/2">
         <Map
           ref={mapRef}
+          onLoad={() => setMapLoaded(true)}
           initialViewState={{
             latitude: user?.location?.latitude,
             longitude: user?.location?.longitude,
@@ -291,6 +332,46 @@ export default function Assist() {
               </div>
             </Popup>
           )}
+
+          {DriverLocation && (
+            <>
+              <Marker
+                latitude={Number(DriverLocation.lat)}
+                longitude={Number(DriverLocation.lng)}
+                color="green"
+                onClick={(e) => {
+                  e.originalEvent.stopPropagation(); // Prevent event bubbling
+                  setShowDriverPopup(true);
+                }}
+              />
+              {showDriverPopup && driverInfo && (
+                <Popup
+                  latitude={Number(DriverLocation.lat)}
+                  longitude={Number(DriverLocation.lng)}
+                  closeOnClick
+                  onClose={() => setShowDriverPopup(false)}
+                >
+                  <div className="p-2 bg-primary rounded shadow-md text-center">
+                    <h3 className="text-base font-semibold text-accent">
+                      {driverInfo.name}
+                    </h3>
+                    <p className="text-white/80 text-base">
+                      {driverInfo.phone}
+                    </p>
+                    <button
+                      className="mt-2 p-1 bg-accent text-black rounded text-xs outline-none"
+                      onClick={() => {
+                        navigator.clipboard.writeText(driverInfo.phone);
+                        toast.success("Copied");
+                      }}
+                    >
+                      Copy Number
+                    </button>
+                  </div>
+                </Popup>
+              )}
+            </>
+          )}
         </Map>
       </div>
 
@@ -340,45 +421,43 @@ export default function Assist() {
         <ScrollArea className="h-[450px]">
           <ul id="cards-wrapper" className="grid grid-cols-1 gap-[20px]">
             {filteredServices.length > 0 ? (
-              filteredServices
-                .map((service, index) => (
-                  <li
-                    key={index}
-                    className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
-                    onClick={() => handleSelectService(service)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-accent">
-                        Name: <span className="text-white">{service.name}</span>
-                      </span>
-                      <span className="text-accent">
-                        Phone:{" "}
-                        <span className="text-white">{service.phone}</span>
-                      </span>
-                    </div>
+              filteredServices.map((service, index) => (
+                <li
+                  key={index}
+                  className="shadow-sm shadow-accent flex flex-col gap-3 px-2 xl:px-4 py-3 rounded-md font-semibold text-sm xl:text-base"
+                  onClick={() => handleSelectService(service)}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-accent">
+                      Name: <span className="text-white">{service.name}</span>
+                    </span>
+                    <span className="text-accent">
+                      Phone: <span className="text-white">{service.phone}</span>
+                    </span>
+                  </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-accent">
-                        Type: <span className="text-white">{service.role}</span>
-                      </span>
-                      <button
-                        disabled={requesting === service.email}
-                        className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
-                          requesting === service.email
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPendingService(service);
-                          setShowModal(true);
-                        }}
-                      >
-                        {requesting === service.email ? <FaCheck /> : "Request"}
-                      </button>
-                    </div>
-                  </li>
-                ))
+                  <div className="flex justify-between items-center">
+                    <span className="text-accent">
+                      Type: <span className="text-white">{service.role}</span>
+                    </span>
+                    <button
+                      disabled={requesting === service.email}
+                      className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
+                        requesting === service.email
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPendingService(service);
+                        setShowModal(true);
+                      }}
+                    >
+                      {requesting === service.email ? <FaCheck /> : "Request"}
+                    </button>
+                  </div>
+                </li>
+              ))
             ) : (
               <li className="text-white">No services available.</li>
             )}
