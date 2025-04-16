@@ -10,8 +10,6 @@ import { FaCheck, FaSpinner } from "react-icons/fa";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "../context/userContext";
 import { useSearchParams } from "next/navigation";
-import { set } from "mongoose";
-
 type RescueService = {
   name: string;
   email: string;
@@ -305,6 +303,21 @@ export default function Assist() {
                   {" "}
                   {selectedService.phone}
                 </p>
+                <button
+                      disabled={requesting === selectedService.email}
+                      className={`button bg-accent text-black font-semibold px-3 py-1 rounded hover:bg-opacity-80 transition-all ${
+                        requesting === selectedService.email
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPendingService(selectedService);
+                        setShowModal(true);
+                      }}
+                    >
+                      {requesting === selectedService.email ? <FaCheck /> : "Request"}
+                    </button>
               </div>
             </Popup>
           )}
