@@ -65,7 +65,7 @@ const Nav = () => {
     };
     getNotifications();
 
-    const interval = setInterval(getNotifications, 30000); // poll every 30s
+    const interval = setInterval(getNotifications, 20000); // poll every 20s
     return () => clearInterval(interval);
   }, [status, session?.user?.email]);
 

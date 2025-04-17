@@ -222,8 +222,8 @@ export default function Assist() {
           driverPhone: user.phone,
           driverEmail: user.email,
           location: {
-            latitude: service?.location.latitude,
-            longitude: service?.location.longitude,
+            latitude: user?.location.latitude,
+            longitude: user?.location.longitude,
           },
           rescuerEmail: service.email,
           rescuerName: service.name,
@@ -496,10 +496,11 @@ export default function Assist() {
               {selectedEmergency === "Other" && (
                 <textarea
                   placeholder="Describe your emergency..."
-                  className="w-full p-2 rounded  mb-4 bg-primary focus:outline-none focus:ring-1 focus:ring-accent text-white "
-                  rows={3}
+                  className="w-full p-2 rounded  mb-4 bg-primary focus:outline-none ring-1 ring-white focus:ring-accent text-white "
+                  rows={2}
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
+                  maxLength={20}
                 />
               )}
 
