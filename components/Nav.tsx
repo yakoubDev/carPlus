@@ -317,7 +317,12 @@ const Nav = () => {
             ) : (
               <button
                 className="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() =>
+                  signIn("google", {
+                    callbackUrl: "/",
+                    prompt: "select_account", // 👈 This forces the account chooser
+                  })
+                }
               >
                 Login
               </button>
@@ -493,7 +498,12 @@ const Nav = () => {
             ) : (
               <button
                 className="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() =>
+                  signIn("google", {
+                    callbackUrl: "/",
+                    prompt: "select_account", // 👈 This forces the account chooser
+                  })
+                }
               >
                 Login
               </button>
