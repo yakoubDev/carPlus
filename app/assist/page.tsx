@@ -118,12 +118,12 @@ export default function Assist() {
               ...prev,
               location: { latitude, longitude },
             }));
-            // console.log("Location updated");
           },
           (error) => {
             console.error("Geolocation error:", error);
             setIsLoading(false);
-          }
+          },
+          
         );
       } else {
         console.error("Geolocation not supported");
@@ -500,7 +500,7 @@ export default function Assist() {
                   rows={2}
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
-                  maxLength={20}
+                  maxLength={30}
                 />
               )}
 
