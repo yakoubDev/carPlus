@@ -344,7 +344,7 @@ const Nav = () => {
                 </span>
               )}
               {showNotifications && (
-                <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[360px] h-screen overflow-y-auto z-50 p-2">
+                <div className="absolute top-10 right-[-120px] bg-primary shadow-lg border rounded-md w-[360px] max-h-[400px] overflow-y-auto z-50 p-2">
                   <div className="flex justify-between items-center w-full">
                     <h1 className="text-lg font-semibold px-2 text-white">
                       Notifications
