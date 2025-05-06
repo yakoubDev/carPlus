@@ -10,6 +10,7 @@ import { FaCheck, FaSpinner } from "react-icons/fa";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "../context/userContext";
 import { useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 type RescueService = {
   name: string;
   email: string;
@@ -36,6 +37,17 @@ type User = {
 };
 
 export default function Assist() {
+  const { data: session, status } = useSession();
+
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      signIn("google", {
+        callbackUrl: "/assist",
+        prompt: "select_account",
+      });
+    }
+  }, [status]);
+  
   const { user, setUser } = useUser();
   const [services, setServices] = useState<RescueService[]>([]);
   const [filters, setFilters] = useState<Filters>({
@@ -122,8 +134,7 @@ export default function Assist() {
           (error) => {
             console.error("Geolocation error:", error);
             setIsLoading(false);
-          },
-          
+          }
         );
       } else {
         console.error("Geolocation not supported");
@@ -304,20 +315,24 @@ export default function Assist() {
                   {selectedService.phone}
                 </p>
                 <button
-                      disabled={requesting === selectedService.email}
-                      className={`px-2 py-1 mt-2 bg-accent text-black font-semibold  rounded hover:bg-opacity-80 transition-all ${
-                        requesting === selectedService.email
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPendingService(selectedService);
-                        setShowModal(true);
-                      }}
-                    >
-                      {requesting === selectedService.email ? <FaCheck /> : "Request"}
-                    </button>
+                  disabled={requesting === selectedService.email}
+                  className={`px-2 py-1 mt-2 bg-accent text-black font-semibold  rounded hover:bg-opacity-80 transition-all ${
+                    requesting === selectedService.email
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPendingService(selectedService);
+                    setShowModal(true);
+                  }}
+                >
+                  {requesting === selectedService.email ? (
+                    <FaCheck />
+                  ) : (
+                    "Request"
+                  )}
+                </button>
               </div>
             </Popup>
           )}
@@ -518,7 +533,10 @@ export default function Assist() {
                 </button>
                 <button
                   className="px-4 py-2 bg-accent rounded text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!selectedEmergency || (selectedEmergency === "Other" && !customMessage)}
+                  disabled={
+                    !selectedEmergency ||
+                    (selectedEmergency === "Other" && !customMessage)
+                  }
                   onClick={() => {
                     if (!selectedEmergency) {
                       toast.error("Please select an emergency type.");
