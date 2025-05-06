@@ -15,10 +15,12 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Email from "next-auth/providers/email";
 import { useRouter } from "next/navigation";
+import { TiDelete } from "react-icons/ti";
+import { MdDeleteSweep } from "react-icons/md";
 
 const Nav = () => {
   type Notification = {
-    id: string;
+    _id: string;
     driverName: string;
     driverPhone: string;
     driverEmail: string;
@@ -55,6 +57,7 @@ const Nav = () => {
           const data = await response.json();
           if (response.ok) {
             setNotifications(data.notifications);
+            // console.log(notifications);
           } else {
             console.error("Failed to fetch notifications", data.message);
           }
@@ -64,8 +67,9 @@ const Nav = () => {
       }
     };
     getNotifications();
+    
 
-    const interval = setInterval(getNotifications, 20000); // poll every 20s
+    const interval = setInterval(getNotifications, 10000); // poll every 20s
     return () => clearInterval(interval);
   }, [status, session?.user?.email]);
 
@@ -165,6 +169,28 @@ const Nav = () => {
       console.log(error);
     }
   };
+
+  const deleteNotification = async (note: Notification, index: number) => {
+    try {
+      const response = await fetch("/api/delete-notification", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: note._id
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNotifications((prev) => prev.filter((_, i) => i !== index));
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -174,7 +200,7 @@ const Nav = () => {
       }}
     >
       <nav className="fixed top-0 left-0 w-full px-4 xl:px-8 py-3 bg-primary z-50 flex justify-between items-center">
-        <Link href="/" className="text-4xl inline-flex gap-1">
+        <Link href="/" className="text-4xl font-semibold inline-flex gap-1">
           <span>Car</span>
           <span className="text-accent">+</span>
         </Link>
@@ -227,7 +253,7 @@ const Nav = () => {
                           className="text-sm text-white px-2 cursor-pointer underline-offset-1 underline opacity-60 hover:opacity-90"
                           onClick={() => clearNotifications()}
                         >
-                          Clear
+                          <MdDeleteSweep className="text-2xl"/>
                         </p>
                       </div>
                       {filteredNotifications.length > 0 ? (
@@ -277,17 +303,21 @@ const Nav = () => {
                                 </div>
                               </>
                             ) : (
-                              <p
-                                className={`${
-                                  note.status === "accepted"
-                                    ? "text-accent"
-                                    : "text-red-500"
-                                } text-left`}
-                              >
-                                {note.status === "accepted"
-                                  ? `✅ ${note.rescuerName} accepted your request!`
-                                  : `❌ ${note.rescuerName} rejected your request!`}
-                              </p>
+                              <div className="flex justify-between items-center w-full">
+                                  <p
+                                    className={`${
+                                      note.status === "accepted"
+                                        ? "text-accent"
+                                        : "text-red-500"
+                                    } text-left`}
+                                  >
+                                    {note.status === "accepted"
+                                      ? `✅ ${note.rescuerName} accepted your request!`
+                                      : `❌ ${note.rescuerName} rejected your request!`}
+                                  </p>
+    
+                                  <span className="text-2xl text-red-500 opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
+                              </div>
                             )}
                           </div>
                         ))
@@ -353,7 +383,7 @@ const Nav = () => {
                       className="text-sm text-white px-2 cursor-pointer underline-offset-1 underline opacity-60 hover:opacity-90"
                       onClick={() => clearNotifications()}
                     >
-                      Clear
+                      <MdDeleteSweep className="text-xl"/>
                     </p>
                   </div>
                   {filteredNotifications.length > 0 ? (
@@ -403,17 +433,21 @@ const Nav = () => {
                             </div>
                           </>
                         ) : (
-                          <p
-                            className={`${
-                              note.status === "accepted"
-                                ? "text-accent"
-                                : "text-red-500"
-                            } text-left`}
-                          >
-                            {note.status === "accepted"
-                              ? `✅ ${note.rescuerName} accepted your request!`
-                              : `❌ ${note.rescuerName} rejected your request!`}
-                          </p>
+                          <div className="flex justify-between items-center w-full">
+                                  <p
+                                    className={`${
+                                      note.status === "accepted"
+                                        ? "text-accent"
+                                        : "text-red-500"
+                                    } text-left`}
+                                  >
+                                    {note.status === "accepted"
+                                      ? `✅ ${note.rescuerName} accepted your request!`
+                                      : `❌ ${note.rescuerName} rejected your request!`}
+                                  </p>
+    
+                                  <span className="text-2xl text-red-500 opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
+                              </div>
                         )}
                       </div>
                     ))

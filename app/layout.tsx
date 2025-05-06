@@ -1,5 +1,7 @@
 import './globals.css'
-import {JetBrains_Mono} from "next/font/google";
+// import {JetBrains_Mono} from "next/font/google";
+import { Orbitron } from "next/font/google";
+
 
 // components
 import Nav from '@/components/Nav';
@@ -13,11 +15,18 @@ import AvailableHandler from '@/components/AvailableHandler';
 
 
 
-const jetbrainsMono = JetBrains_Mono({
+// const jetbrainsMono = JetBrains_Mono({
+//   subsets: ["latin"],
+//   weight: ["100","200","300","400","500","600","700","800"],
+//   variable: '--font-jetbrainsMono',
+// })
+
+const orbitron = Orbitron({
   subsets: ["latin"],
-  weight: ["100","200","300","400","500","600","700","800"],
-  variable: '--font-jetbrainsMono',
-})
+  weight: ["400", "500", "600", "700", "800"], // Adjust weights as needed
+  variable: '--font-orbitron',
+});
+
 
 export const metadata = {
   title: "Car+ | Find Nearby Mechanics and Roadside Assistance",
@@ -37,7 +46,7 @@ export default  function RootLayout({ children }: RootLayoutProps) {
   return (
           <html lang="en">
             <body
-                className={jetbrainsMono.variable}
+                className={orbitron.variable}
               >
               <Provider>
                 <UserProvider> 

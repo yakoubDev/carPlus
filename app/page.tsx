@@ -14,8 +14,6 @@ const Home = () => {
   const { user, setUser } = useUser();
 
   useEffect(() => {
-    console.log("session", session?.user);
-    console.log("user:", user);
     if (!session?.user) {
       router.push("/");
     } else if (!user?.role && !user?.phone) {
@@ -32,7 +30,7 @@ const Home = () => {
     }}>
     <div className="flex flex-col items-center justify-center gap-12 xl:flex-row xl:justify-between pt-16">
       <div className="flex flex-col gap-4 w-full xl:w-2/3 text-center xl:text-left items-center xl:items-start">
-        <h1 className="text-4xl md:text-7xl font-semibold">
+        <h1 className="text-4xl md:text-7xl tracking-widest font-semibold">
           <span className="text-accent">Fast Assistance</span> When You Need It
           Most
         </h1>
