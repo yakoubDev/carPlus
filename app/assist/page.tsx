@@ -274,7 +274,7 @@ export default function Assist() {
           style={{ width: "100%", height: 460 }}
           mapStyle="https://api.maptiler.com/maps/f0924eda-983d-4a8a-beb5-379d645f17ac/style.json?key=LGnmlQYoNtKqhtbjpL2X"
         > 
-          <div className="absolute top-4 right-4 bg-primary text-white px-4 py-2 rounded hover:bg-white hover:text-primary border-[1px] cursor-pointer border-primary  transition-all"
+          <div className="absolute top-4 right-4 bg-primary text-white px-4 py-2 rounded cursor-pointer border-primary  transition-all"
           onClick={() => mapRef.current?.flyTo({center: [user?.location?.longitude, user?.location?.latitude]}, {zoom: 14, essential: true})}>
             My Location
           </div>
