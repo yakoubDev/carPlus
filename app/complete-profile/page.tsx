@@ -52,7 +52,7 @@ const CompleteProfile = () => {
   };
 
   return (
-    <section className="mx-auto container flex justify-between items-center h-[80vh]  mt-10">
+    <section className="mx-auto flex justify-between items-center h-[80vh]  my-10">
       <motion.div
         initial={{ opacity: 0, translateX: -200 }}
         whileInView={{
@@ -78,7 +78,7 @@ const CompleteProfile = () => {
         }}
         className="flex flex-col justify-center items-center py-2 xl:p-8 bg-black/10 w-full xl:w-[650px] rounded-md shadow-md shadow-accent"
       >
-        <h1 className="text-accent text-3xl xl:text-4xl font-semibold mt-2 text-center">
+        <h1 className="text-accent text-3xl xl:text-4xl font-semibold mt-2 text-center  w-[95%]">
           Complete your profile!
         </h1>
 

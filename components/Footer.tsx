@@ -21,12 +21,12 @@ const Footer = () => {
     },
   ];
   return (
-    <footer className="flex flex-col gap-6 mt-4 p-0 md:p-10 xl:px-8">
+    <footer className="flex flex-col gap-6 mt-4 py-2 md:px-8">
         {/* Upper Section */}
-      <section className="flex flex-col xl:flex-row  gap-12 xl:justify-between items-center">
+      <section className="flex flex-col md:flex-row  gap-12 md:justify-between items-center">
         {/* Logo And Socials */}
-        <div className="flex flex-row items-center xl:items-start xl:flex-col justify-between xl:gap-4 md:justify-center md:gap-40 w-full xl:w-1/3">
-          <Link href="/" className="text-3xl md:text-4xl inline-flex gap-1">
+        <div className="flex flex-row items-center justify-between md:items-start md:flex-col md:w-1/3  md:gap-4  w-full ">
+          <Link href="/" className="text-3xl md:text-4xl inline-flex gap-1 font-semibold">
             <span>Car</span>
             <span className="text-accent">+</span>
           </Link>

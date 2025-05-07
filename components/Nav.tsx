@@ -13,7 +13,6 @@ import { FaCheck, FaTimes, FaBell } from "react-icons/fa";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import Image from "next/image";
-import Email from "next-auth/providers/email";
 import { useRouter } from "next/navigation";
 import { TiDelete } from "react-icons/ti";
 import { MdDeleteSweep } from "react-icons/md";
@@ -316,7 +315,7 @@ const Nav = () => {
                                       : `❌ ${note.rescuerName} rejected your request!`}
                                   </p>
     
-                                  <span className="text-2xl text-red-500 opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
+                                  <span className="text-2xl  opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
                               </div>
                             )}
                           </div>
@@ -446,7 +445,7 @@ const Nav = () => {
                                       : `❌ ${note.rescuerName} rejected your request!`}
                                   </p>
     
-                                  <span className="text-2xl text-red-500 opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
+                                  <span className="text-2xl opacity-80 hover:opacity-100" onClick={() => deleteNotification(note, index)}><TiDelete/></span>
                               </div>
                         )}
                       </div>
@@ -500,7 +499,7 @@ const Nav = () => {
             </div>
             <Link
               href="/"
-              className="text-4xl inline-flex gap-1"
+              className="text-4xl inline-flex gap-1 font-semibold"
               onClick={() => setToggleMenu(false)}
             >
               <span>Car</span>
