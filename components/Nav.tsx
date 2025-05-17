@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CiMenuFries } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
@@ -45,6 +45,28 @@ const Nav = () => {
   const [toggleMenu, setToggleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setToggleMenu(false);
+      }
+    };
+
+    if (toggleMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [toggleMenu]);
 
   useEffect(() => {
     const getNotifications = async () => {
@@ -490,21 +512,23 @@ const Nav = () => {
         </div>
 
         {toggleMenu && (
-          <div className="bg-primary w-[60%] py-4 fixed right-0 top-0 flex flex-col gap-8 justify-center items-center rounded-md slide-in-right z-40">
+          <div ref={menuRef} className="bg-primary w-[60%] h-screen py-4 fixed right-0 top-0 flex flex-col gap-8  items-center rounded-md slide-in-right z-40">
             <div className="flex justify-end items-center w-full px-4">
               <IoMdClose
                 className="text-[32px] text-accent"
                 onClick={() => setToggleMenu(false)}
               />
             </div>
+
             <Link
               href="/"
-              className="text-4xl inline-flex gap-1 font-semibold"
+              className="text-4xl inline-flex gap-1 font-semibold mb-8"
               onClick={() => setToggleMenu(false)}
             >
               <span>Car</span>
               <span className="text-accent">+ </span>
             </Link>
+
             {links.map((link, index) => (
               <Link
                 href={link.path}
@@ -513,7 +537,7 @@ const Nav = () => {
                 className={`${
                   link.path === pathname &&
                   "text-accent border-b-2 border-accent"
-                } font-medium hover:text-accent transition-all`}
+                } font-medium text-lg hover:text-accent transition-all`}
               >
                 {link.name}
               </Link>
