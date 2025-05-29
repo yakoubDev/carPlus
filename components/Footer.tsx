@@ -70,12 +70,12 @@ const Footer = () => {
 
               <div className='flex gap-1 items-center'>
               <Image src='/assets/socials/phone.svg' height={20} width={20} alt='email' className='font-bold'/>
-              <span>: +(213) 551 15 44 02</span>
+              <span>: +(213) 659170552</span>
               </div>
 
               <div className='flex gap-1 items-center'>
               <Image src='/assets/socials/address.svg' height={20} width={20} alt='email' className='font-bold'/>
-              <span>: Chui Guivera 192.</span>
+              <span>: Chui Guivera 192</span>
               </div>
             </div>
         </div>
